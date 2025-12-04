@@ -187,3 +187,4 @@ El sistema implementa completamente todos los módulos requeridos por el proyect
 
 ### Contacto
 Daniel Mejia Suaza - Estudiante del proyecto de Minería de Datos
+# mineria_de_datos_proyecto
