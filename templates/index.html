@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Avanzado de Minería de Datos - Caracterización de Microclimas</title>
+    <meta name="description" content="Sistema completo de minería de datos para caracterización de microclimas urbanos y predicción de precipitación en Manizales">
+    <meta name="keywords" content="minería de datos, microclimas, predicción precipitación, machine learning, análisis de datos">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1e293b;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(147, 51, 234, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 3rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="25" r="0.5" fill="rgba(255,255,255,0.15)"/><circle cx="25" cy="75" r="0.5" fill="rgba(255,255,255,0.15)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: -2rem auto 0;
+            position: relative;
+            z-index: 3;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon.excel { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .feature-icon.folder { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .feature-icon.analytics { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+        .feature-icon.chart { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            margin: 2rem 0;
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .upload-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtitle {
+            color: var(--secondary-color);
+            font-size: 1rem;
+        }
+
+        .input-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 4px;
+            position: relative;
+        }
+
+        .toggle-option {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--secondary-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-option.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .toggle-slider.folder {
+            transform: translateX(100%);
+        }
+
+        .file-input-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .file-input:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .file-input.dragover {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.05);
+            transform: scale(1.02);
+        }
+
+        .file-input-icon {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-input-text {
+            color: var(--dark-color);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-input-subtext {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .file-icon.excel { background: #dcfce7; color: #166534; }
+        .file-icon.csv { background: #dbeafe; color: #1e40af; }
+
+        .file-details h6 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .file-details small {
+            color: var(--secondary-color);
+            font-size: 0.75rem;
+        }
+
+        .process-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .process-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .process-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .progress-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .progress-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .progress-text {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progress-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .alert-system {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 400px;
+        }
+
+        .alert-custom {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .alert-success { border-left-color: var(--success-color); }
+        .alert-warning { border-left-color: var(--warning-color); }
+        .alert-error { border-left-color: var(--danger-color); }
+
+        .alert-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .alert-success .alert-icon { background: #dcfce7; color: #166534; }
+        .alert-warning .alert-icon { background: #fef3c7; color: #92400e; }
+        .alert-error .alert-icon { background: #fee2e2; color: #dc2626; }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .footer-subtitle {
+            opacity: 0.8;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0 3rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .upload-section {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+
+            .input-toggle {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .toggle-option {
+                width: 100%;
+                padding: 16px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Project Description Styles */
+        .project-description-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .project-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .integrante-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .description-content p.lead {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .objectives-section h5,
+        .modules-section h5,
+        .deliverables-section h5,
+        .evaluation-section h5 {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .objectives-section ul {
+            padding-left: 1.5rem;
+        }
+
+        .objectives-section li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .module-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .module-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .module-header h6 {
+            margin: 0;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .module-features {
+            padding-left: 2.5rem;
+        }
+
+        .module-features li {
+            margin-bottom: 0.25rem;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .deliverables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .deliverable-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .deliverable-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .deliverable-item i {
+            width: 20px;
+            color: var(--primary-color);
+        }
+
+        .deliverable-item:hover i {
+            color: white;
+        }
+
+        .evaluation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .evaluation-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .evaluation-percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .evaluation-text {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .file-summary {
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .file-summary strong {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container hero-content">
+            <div class="text-center">
+                <h1 class="hero-title">Sistema Avanzado de Minería de Datos</h1>
+                <p class="hero-subtitle">Caracterización de Microclimas Urbanos</p>
+                <p class="hero-description">Análisis inteligente de datos meteorológicos con machine learning para predicción de precipitación en Manizales</p>
+                <div class="badge-admin">Proyecto Final - Daniel Mejia Suaza</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Features Grid -->
+        <div class="container mb-5">
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="feature-card text-center p-4 fade-in">
+                        <div class="feature-icon excel">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h5 class="mb-2">Excel & CSV</h5>
+                        <p class="text-muted small">Soporte completo para archivos Excel (.xlsx, .xls) y CSV con múltiples codificaciones</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="feature-card text-center p-4 fade-in">
+                        <div class="feature-icon folder">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h5 class="mb-2">Carpetas Masivas</h5>
+                        <p class="text-muted small">Procesamiento automático de directorios completos hasta 20 GB</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="feature-card text-center p-4 fade-in">
+                        <div class="feature-icon analytics">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5 class="mb-2">Machine Learning</h5>
+                        <p class="text-muted small">7 algoritmos ML con optimización automática para predicción precisa</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="feature-card text-center p-4 fade-in">
+                        <div class="feature-icon chart">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="mb-2">Microclimas</h5>
+                        <p class="text-muted small">Caracterización automática de zonas climáticas urbanas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="container mb-5">
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-number">20 GB</div>
+                    <div class="stat-label">Límite de Carga</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number">14M+</div>
+                    <div class="stat-label">Registros Máximos</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-card fade-in">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Modelos ML</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Microclimas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="container">
+            <div class="upload-section fade-in">
+                <div class="upload-header">
+                    <h2 class="upload-title">
+                        <i class="fas fa-cloud-upload-alt me-3"></i>
+                        Cargar y Procesar Datos
+                    </h2>
+                    <p class="upload-subtitle">Selecciona tus archivos o carpetas para iniciar el análisis completo de minería de datos</p>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="alert alert-danger fade-in">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="input-selector mb-4">
+                        <div class="input-toggle">
+                            <button type="button" class="toggle-option active" data-target="files">
+                                <i class="fas fa-files me-2"></i>Archivos Individuales
+                            </button>
+                            <button type="button" class="toggle-option" data-target="folder">
+                                <i class="fas fa-folder me-2"></i>Carpeta Completa
+                            </button>
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+
+                    <div class="file-input-container">
+                        <div class="file-input-wrapper">
+                            <input type="file" class="file-input" id="filesInput" name="files" accept=".xlsx,.xls,.csv" multiple>
+                            <input type="file" class="file-input" id="folderInput" name="folder_files" webkitdirectory directory multiple style="display: none;">
+
+                            <div class="text-center p-4">
+                                <div class="file-input-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-input-text">Arrastra y suelta tus archivos aquí</div>
+                                <div class="file-input-subtext">O haz clic para seleccionar archivos</div>
+                            </div>
+                        </div>
+
+                        <div id="fileList" class="file-list" style="display: none;"></div>
+
+                        <button type="button" class="process-button mt-4" id="miningBtn" onclick="startFullMining()">
+                            <i class="fas fa-rocket me-2"></i>
+                            Iniciar Análisis Completo de Minería de Datos
+                        </button>
+
+                        <div class="alert alert-info mt-3" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #1e40af;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Si no selecciona archivos, el sistema utilizará automáticamente los archivos CSV existentes en la carpeta "uploads/"
+                        </div>
+
+                        <div class="alert alert-success mt-2" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #065f46;">
+                            <i class="fas fa-rocket me-2"></i>
+                            <strong>🚀 Optimizaciones ULTRA-RÁPIDAS + MULTI-ARCHIVO activas:</strong>
+                            <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                <li><strong>📁 Procesamiento multi-archivo:</strong> Combina TODOS los archivos CSV/Excel en un análisis unificado</li>
+                                <li><strong>⚡ Muestreo ultra-agresivo:</strong> Datasets >50k filas → máximo 25k filas (95% reducción)</li>
+                                <li><strong>🧠 Procesamiento adaptativo:</strong> Polars/Dask según tamaño + algoritmos especializados</li>
+                                <li><strong>🎯 Modelos optimizados:</strong> MiniBatchKMeans, ExtraTrees, algoritmos lineales para velocidad</li>
+                                <li><strong>💾 Muestreo inteligente:</strong> Optimización por archivo + muestreo combinado final</li>
+                                <li><strong>📊 Resultados unificados:</strong> Un solo reporte completo de todos los archivos procesados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Progress Overlay -->
+        <div class="progress-overlay" id="progressOverlay">
+            <div class="progress-modal">
+                <div class="progress-title">
+                    <i class="fas fa-cogs me-2"></i>
+                    Procesando Datos
+                </div>
+                <div class="progress-text" id="progressText">Iniciando análisis de minería de datos...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert System -->
+        <div class="alert-system" id="alertSystem"></div>
+    </div>
+
+    <!-- Project Description Section -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="project-description-card">
+                    <div class="card-header-custom">
+                        <h3 class="project-title">
+                            <i class="fas fa-project-diagram me-3"></i>
+                            Proyecto Final - Minería de Datos
+                        </h3>
+                        <div class="integrante-badge">
+                            <i class="fas fa-user-graduate me-2"></i>
+                            Integrante: Daniel Mejia Suaza
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <h4 class="theme-title">
+                            <i class="fas fa-cloud-rain me-2"></i>
+                            Tema: Caracterización de Microclimas y Predicción de Precipitación en Zonas Urbanas
+                        </h4>
+
+                        <div class="description-content">
+                            <p class="lead">
+                                Las ciudades, debido a su topografía y desarrollo urbano, a menudo presentan variaciones climáticas
+                                significativas en distancias cortas, dando lugar a lo que se conoce como <strong>microclimas</strong>.
+                            </p>
+
+                            <div class="objectives-section">
+                                <h5><i class="fas fa-bullseye me-2"></i>Objetivos del Proyecto:</h5>
+                                <ul>
+                                    <li>Caracterizar microclimas urbanos en Manizales mediante análisis de datos meteorológicos</li>
+                                    <li>Desarrollar modelos predictivos de precipitación diferenciados por microclima</li>
+                                    <li>Utilizar técnicas avanzadas de minería de datos para análisis de series temporales</li>
+                                    <li>Generar insights para gestión de riesgos y planificación urbana</li>
+                                </ul>
+                            </div>
+
+                            <div class="modules-section">
+                                <h5><i class="fas fa-cubes me-2"></i>Módulos del Sistema:</h5>
+
+                                <div class="module-card">
+                                    <div class="module-header">
+                                        <span class="module-number">1</span>
+                                        <h6>Preprocesamiento y Exploración de Datos</h6>
+                                    </div>
+                                    <ul class="module-features">
+                                        <li>Recolección y estructuración de series temporales meteorológicas</li>
+                                        <li>Variables: Humedad, Precipitación, Radiación Solar, Temperatura</li>
+                                        <li>Limpieza e imputación de datos faltantes</li>
+                                        <li>Análisis Exploratorio de Datos (EDA)</li>
+                                        <li>Correlaciones y patrones temporales</li>
+                                    </ul>
+                                </div>
+
+                                <div class="module-card">
+                                    <div class="module-header">
+                                        <span class="module-number">2</span>
+                                        <h6>Caracterización de Microclimas</h6>
+                                    </div>
+                                    <ul class="module-features">
+                                        <li>Algoritmos de clustering (K-Means, DBSCAN)</li>
+                                        <li>Determinación óptima del número de clusters</li>
+                                        <li>Método del codo y coeficiente de silueta</li>
+                                        <li>Visualización de microclimas identificados</li>
+                                        <li>Análisis de patrones climáticos homogéneos</li>
+                                    </ul>
+                                </div>
+
+                                <div class="module-card">
+                                    <div class="module-header">
+                                        <span class="module-number">3</span>
+                                        <h6>Predicción de Precipitación</h6>
+                                    </div>
+                                    <ul class="module-features">
+                                        <li>Múltiples algoritmos de Machine Learning</li>
+                                        <li>Predicciones diferenciadas por microclima</li>
+                                        <li>Entrenamiento y validación de modelos</li>
+                                        <li>Evaluación con métricas apropiadas</li>
+                                        <li>Análisis de tendencias y anomalías</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="deliverables-section">
+                                <h5><i class="fas fa-clipboard-check me-2"></i>Entregables:</h5>
+                                <div class="deliverables-grid">
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span>Informe de preprocesamiento de datos</span>
+                                    </div>
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <span>Resultados del EDA con visualizaciones</span>
+                                    </div>
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-code"></i>
+                                        <span>Código fuente documentado</span>
+                                    </div>
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <span>Informe de caracterización de microclimas</span>
+                                    </div>
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-brain"></i>
+                                        <span>Modelo de predicción validado</span>
+                                    </div>
+                                    <div class="deliverable-item">
+                                        <i class="fas fa-presentation"></i>
+                                        <span>Presentación oral del proyecto</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="evaluation-section">
+                                <h5><i class="fas fa-star me-2"></i>Criterios de Evaluación:</h5>
+                                <div class="evaluation-grid">
+                                    <div class="evaluation-item">
+                                        <div class="evaluation-percentage">30%</div>
+                                        <div class="evaluation-text">Claridad y Completitud del Informe</div>
+                                    </div>
+                                    <div class="evaluation-item">
+                                        <div class="evaluation-percentage">30%</div>
+                                        <div class="evaluation-text">Calidad y Funcionalidad del Código</div>
+                                    </div>
+                                    <div class="evaluation-item">
+                                        <div class="evaluation-percentage">20%</div>
+                                        <div class="evaluation-text">Validez de la Metodología</div>
+                                    </div>
+                                    <div class="evaluation-item">
+                                        <div class="evaluation-percentage">10%</div>
+                                        <div class="evaluation-text">Análisis y Validación del Modelo</div>
+                                    </div>
+                                    <div class="evaluation-item">
+                                        <div class="evaluation-percentage">10%</div>
+                                        <div class="evaluation-text">Presentación Oral</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container footer-content">
+            <h6 class="footer-title">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Proyecto Final de Minería de Datos
+            </h6>
+            <p class="footer-subtitle">Universidad - Caracterización de Microclimas Urbanos</p>
+            <p class="footer-subtitle">Integrante: Daniel Mejia Suaza</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentInputMode = 'files';
+        let selectedFiles = [];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            setupToggleButtons();
+            setupFileInputs();
+            setupDragAndDrop();
+            setupFormSubmission();
+        }
+
+        // Setup toggle buttons
+        function setupToggleButtons() {
+            const toggleOptions = document.querySelectorAll('.toggle-option');
+
+            toggleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+
+                    // Update active state
+                    toggleOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Update slider position
+                    const slider = document.querySelector('.toggle-slider');
+                    slider.classList.toggle('folder', target === 'folder');
+
+                    // Switch input mode
+                    switchInputMode(target);
+                });
+            });
+        }
+
+        // Switch between file and folder input modes
+        function switchInputMode(mode) {
+            currentInputMode = mode;
+
+            const filesInput = document.getElementById('filesInput');
+            const folderInput = document.getElementById('folderInput');
+
+            if (mode === 'files') {
+                filesInput.style.display = 'block';
+                folderInput.style.display = 'none';
+                filesInput.required = true;
+                folderInput.required = false;
+            } else {
+                filesInput.style.display = 'none';
+                folderInput.style.display = 'block';
+                filesInput.required = false;
+                folderInput.required = true;
+            }
+
+            // Clear current selection
+            selectedFiles = [];
+            updateFileDisplay();
+        }
+
+        // Setup file inputs
+        function setupFileInputs() {
+            const filesInput = document.getElementById('filesInput');
+            const folderInput = document.getElementById('folderInput');
+
+            filesInput.addEventListener('change', function(e) {
+                selectedFiles = Array.from(e.target.files);
+                updateFileDisplay();
+            });
+
+            folderInput.addEventListener('change', function(e) {
+                selectedFiles = Array.from(e.target.files);
+                updateFileDisplay();
+            });
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const fileInputs = document.querySelectorAll('.file-input');
+
+            fileInputs.forEach(input => {
+                const wrapper = input.parentElement;
+
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    wrapper.addEventListener(eventName, preventDefaults, false);
+                });
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    wrapper.addEventListener(eventName, highlight, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    wrapper.addEventListener(eventName, unhighlight, false);
+                });
+
+                wrapper.addEventListener('drop', handleDrop, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight(e) {
+                const wrapper = e.currentTarget;
+                const input = wrapper.querySelector('.file-input');
+                input.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                const wrapper = e.currentTarget;
+                const input = wrapper.querySelector('.file-input');
+                input.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (currentInputMode === 'files') {
+                    document.getElementById('filesInput').files = files;
+                    selectedFiles = Array.from(files);
+                } else {
+                    // For folder mode, we need to handle webkitdirectory
+                    // This is a limitation - drag & drop for folders is complex
+                    showAlert('warning', 'Para carpetas, use el botón de selección de archivos');
+                    return;
+                }
+
+                updateFileDisplay();
+            }
+        }
+
+        // Update file display
+        function updateFileDisplay() {
+            const fileList = document.getElementById('fileList');
+
+            if (selectedFiles.length === 0) {
+                fileList.style.display = 'none';
+                return;
+            }
+
+            fileList.style.display = 'block';
+            fileList.innerHTML = '';
+
+            // Filter valid files
+            const validFiles = selectedFiles.filter(file =>
+                file.name.endsWith('.xlsx') ||
+                file.name.endsWith('.xls') ||
+                file.name.endsWith('.csv')
+            );
+
+            if (validFiles.length === 0) {
+                fileList.innerHTML = '<div class="alert alert-warning">No se encontraron archivos Excel o CSV válidos</div>';
+                return;
+            }
+
+            // Group by type
+            const excelFiles = validFiles.filter(f => f.name.endsWith('.xlsx') || f.name.endsWith('.xls'));
+            const csvFiles = validFiles.filter(f => f.name.endsWith('.csv'));
+
+            // Add summary
+            const summary = document.createElement('div');
+            summary.className = 'file-summary mb-3 p-3 bg-light rounded';
+            summary.innerHTML = `
+                <strong>Resumen:</strong> ${excelFiles.length} Excel + ${csvFiles.length} CSV = ${validFiles.length} archivos válidos
+                <br><small class="text-muted">Tamaño total: ${formatFileSize(validFiles.reduce((sum, f) => sum + f.size, 0))}</small>
+            `;
+            fileList.appendChild(summary);
+
+            // Add file items
+            validFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+
+                const fileType = file.name.endsWith('.csv') ? 'csv' : 'excel';
+                const fileIcon = fileType === 'csv' ?
+                    '<i class="fas fa-file-csv"></i>' :
+                    '<i class="fas fa-file-excel"></i>';
+
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon ${fileType}">
+                            ${fileIcon}
+                        </div>
+                        <div class="file-details">
+                            <h6>${file.name}</h6>
+                            <small>${formatFileSize(file.size)}</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        // Setup form submission
+        function setupFormSubmission() {
+            const form = document.getElementById('uploadForm');
+            const miningBtn = document.getElementById('miningBtn');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                startMiningProcess();
+            });
+
+            miningBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startMiningProcess();
+            });
+        }
+
+        // Start mining process
+        function startMiningProcess() {
+            const validFiles = selectedFiles.filter(file =>
+                file.name.endsWith('.xlsx') ||
+                file.name.endsWith('.xls') ||
+                file.name.endsWith('.csv')
+            );
+
+            if (validFiles.length === 0) {
+                showAlert('error', 'No hay archivos válidos seleccionados');
+                return;
+            }
+
+            // Show progress overlay
+            showProgress();
+
+            // Update form with selected files
+            const formData = new FormData();
+            formData.append('inputType', currentInputMode);
+
+            validFiles.forEach(file => {
+                if (currentInputMode === 'files') {
+                    formData.append('files', file);
+                } else {
+                    formData.append('folder_files', file);
+                }
+            });
+
+            // Submit form
+            const form = document.getElementById('uploadForm');
+            form.action = '/process-mining';
+            form.method = 'POST';
+
+            // Replace form inputs with our data
+            const originalInputs = form.querySelectorAll('input[type="file"]');
+            originalInputs.forEach(input => input.remove());
+
+            // Add our files to the form
+            validFiles.forEach(file => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.name = currentInputMode === 'files' ? 'files' : 'folder_files';
+                input.style.display = 'none';
+
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+
+                form.appendChild(input);
+            });
+
+            form.submit();
+        }
+
+        // Show progress overlay
+        function showProgress() {
+            const overlay = document.getElementById('progressOverlay');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            overlay.classList.add('show');
+            progressText.textContent = 'Iniciando análisis de minería de datos...';
+
+            // Simulate progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+
+                progressFill.style.width = progress + '%';
+
+                if (progress > 30) progressText.textContent = 'Procesando datos...';
+                if (progress > 60) progressText.textContent = 'Aplicando algoritmos de machine learning...';
+                if (progress > 80) progressText.textContent = 'Generando reportes y visualizaciones...';
+
+            }, 1000);
+
+            // Auto-hide after 5 minutes (will be overridden by actual completion)
+            setTimeout(() => {
+                clearInterval(interval);
+                overlay.classList.remove('show');
+            }, 300000);
+        }
+
+        // Remove file from selection
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileDisplay();
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const alertSystem = document.getElementById('alertSystem');
+
+            const alert = document.createElement('div');
+            alert.className = `alert-custom alert-${type} fade-in`;
+
+            const icon = type === 'success' ? 'check-circle' :
+                        type === 'warning' ? 'exclamation-triangle' : 'times-circle';
+
+            alert.innerHTML = `
+                <div class="alert-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="flex-1">
+                    <strong>${type === 'success' ? 'Éxito' : type === 'warning' ? 'Advertencia' : 'Error'}</strong><br>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+
+            alertSystem.appendChild(alert);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Add click handler to file input area
+        document.querySelector('.file-input-wrapper').addEventListener('click', function() {
+            const input = currentInputMode === 'files' ?
+                document.getElementById('filesInput') :
+                document.getElementById('folderInput');
+            input.click();
+        });
+    </script>
+</body>
+</html>
