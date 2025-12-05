@@ -11,15 +11,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2563eb;
+            --primary-color: #1e40af;
+            --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
             --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1e293b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --dark-color: #0f172a;
             --light-bg: #f8fafc;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --luxury-gold: #ffd700;
+            --luxury-silver: #c0c0c0;
+            --luxury-platinum: #e5e7eb;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+            --luxury-shadow: 0 0 30px rgba(30, 64, 175, 0.3);
+            --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -37,12 +45,13 @@
         }
 
         .hero-section {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(147, 51, 234, 0.9) 100%);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.95) 0%, rgba(147, 51, 234, 0.95) 50%, rgba(59, 130, 246, 0.95) 100%);
+            backdrop-filter: blur(20px);
             color: white;
-            padding: 3rem 0 4rem;
+            padding: 4rem 0 5rem;
             position: relative;
             overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .hero-section::before {
@@ -52,8 +61,18 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="25" r="0.5" fill="rgba(255,255,255,0.15)"/><circle cx="25" cy="75" r="0.5" fill="rgba(255,255,255,0.15)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
-            opacity: 0.1;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="luxury-grain" width="200" height="200" patternUnits="userSpaceOnUse"><circle cx="100" cy="100" r="2" fill="rgba(255,255,255,0.15)"/><circle cx="50" cy="150" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="150" cy="50" r="1.5" fill="rgba(255,255,255,0.12)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23luxury-grain)"/></svg>');
+            opacity: 0.8;
+            animation: luxuryShimmer 8s ease-in-out infinite;
+        }
+
+        @keyframes luxuryShimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
 
         .hero-content {
@@ -720,6 +739,41 @@
         .file-summary strong {
             color: white;
         }
+
+        .badge-admin {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-silver) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #1e293b;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            box-shadow: var(--luxury-shadow);
+            text-shadow: var(--text-shadow);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge-admin::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: luxury-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes luxury-glow {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
     </style>
 </head>
 <body>
@@ -909,8 +963,16 @@
                             Proyecto Final - Minería de Datos
                         </h3>
                         <div class="integrante-badge">
+                            <i class="fas fa-university me-2"></i>
+                            Universidad Nacional de Colombia - sede Manizales
+                        </div>
+                        <div class="integrante-badge mt-2">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            Estudiante de Administración de Sistemas Informáticos
+                        </div>
+                        <div class="integrante-badge mt-2">
                             <i class="fas fa-user-graduate me-2"></i>
-                            Integrante: Daniel Mejia Suaza
+                            Daniel Mejia Suaza
                         </div>
                     </div>
 
@@ -1012,31 +1074,7 @@
                                 </div>
                             </div>
 
-                            <div class="evaluation-section">
-                                <h5><i class="fas fa-star me-2"></i>Criterios de Evaluación:</h5>
-                                <div class="evaluation-grid">
-                                    <div class="evaluation-item">
-                                        <div class="evaluation-percentage">30%</div>
-                                        <div class="evaluation-text">Claridad y Completitud del Informe</div>
-                                    </div>
-                                    <div class="evaluation-item">
-                                        <div class="evaluation-percentage">30%</div>
-                                        <div class="evaluation-text">Calidad y Funcionalidad del Código</div>
-                                    </div>
-                                    <div class="evaluation-item">
-                                        <div class="evaluation-percentage">20%</div>
-                                        <div class="evaluation-text">Validez de la Metodología</div>
-                                    </div>
-                                    <div class="evaluation-item">
-                                        <div class="evaluation-percentage">10%</div>
-                                        <div class="evaluation-text">Análisis y Validación del Modelo</div>
-                                    </div>
-                                    <div class="evaluation-item">
-                                        <div class="evaluation-percentage">10%</div>
-                                        <div class="evaluation-text">Presentación Oral</div>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
