@@ -369,22 +369,51 @@ class MicroclimateClustering:
             else:
                 print(f"✅ Usando {len(valid_numeric_columns)} columnas numéricas válidas para estadísticas")
 
-                # Estadísticas por cluster con manejo de errores
-                try:
-                    cluster_stats = results_df.groupby('cluster')[valid_numeric_columns].agg(['mean', 'std', 'min', 'max', 'count'])
-                    cluster_analysis['cluster_statistics'] = cluster_stats.to_dict()
-                except Exception as e:
-                    print(f"⚠️  Error calculando estadísticas de cluster: {e}")
-                    # Fallback: calcular estadísticas manualmente
-                    cluster_stats_manual = {}
-                    for col in valid_numeric_columns[:3]:  # Limitar a primeras 3 columnas para velocidad
+            # Estadísticas por cluster con manejo robusto de tipos de datos
+            try:
+                # Filtrar aún más las columnas para asegurar que sean completamente numéricas
+                truly_numeric_columns = []
+                for col in valid_numeric_columns:
+                    try:
+                        # Verificar que la columna sea completamente numérica sin valores mixtos
+                        col_data = results_df[col]
+                        # Convertir a numérico y verificar que no se pierdan muchos valores
+                        numeric_col = pd.to_numeric(col_data, errors='coerce')
+                        if numeric_col.notna().sum() > len(col_data) * 0.9:  # Al menos 90% numérico
+                            truly_numeric_columns.append(col)
+                        else:
+                            print(f"⚠️  Columna {col} descartada: solo {numeric_col.notna().sum()}/{len(col_data)} valores numéricos")
+                    except Exception as col_check_error:
+                        print(f"⚠️  Error verificando columna {col}: {col_check_error}")
+                        continue
+
+                if len(truly_numeric_columns) == 0:
+                    cluster_analysis['cluster_statistics'] = {'warning': 'No truly numeric columns found for detailed statistics'}
+                else:
+                    print(f"✅ Calculando estadísticas para {len(truly_numeric_columns)} columnas numéricas válidas")
+
+                    # Calcular estadísticas por cluster de forma segura
+                    cluster_stats_dict = {}
+                    for col in truly_numeric_columns:
                         try:
-                            col_stats = results_df.groupby('cluster')[col].agg(['mean', 'std', 'count'])
-                            cluster_stats_manual[col] = col_stats.to_dict()
+                            col_stats = results_df.groupby('cluster')[col].agg(['mean', 'std', 'min', 'max', 'count'])
+                            # Convertir a tipos nativos de Python para evitar problemas de serialización
+                            col_stats_clean = {}
+                            for stat_name in ['mean', 'std', 'min', 'max', 'count']:
+                                if stat_name in col_stats.columns:
+                                    stat_values = col_stats[stat_name].to_dict()
+                                    # Convertir valores numpy a tipos Python
+                                    col_stats_clean[stat_name] = {k: float(v) if pd.notna(v) else None for k, v in stat_values.items()}
+                            cluster_stats_dict[col] = col_stats_clean
                         except Exception as col_error:
-                            print(f"⚠️  Error en columna {col}: {col_error}")
+                            print(f"⚠️  Error calculando estadísticas para columna {col}: {col_error}")
                             continue
-                    cluster_analysis['cluster_statistics'] = cluster_stats_manual if cluster_stats_manual else {'error': 'Could not calculate statistics'}
+
+                    cluster_analysis['cluster_statistics'] = cluster_stats_dict if cluster_stats_dict else {'warning': 'Could not calculate detailed statistics'}
+
+            except Exception as e:
+                print(f"⚠️  Error general calculando estadísticas de cluster: {e}")
+                cluster_analysis['cluster_statistics'] = {'error': str(e)}
 
             # Tamaño de clusters
             cluster_sizes = results_df['cluster'].value_counts().sort_index()

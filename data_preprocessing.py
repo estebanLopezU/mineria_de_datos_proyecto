@@ -79,11 +79,75 @@ class DataPreprocessor:
             else:
                 raise ValueError("data_source debe ser un filepath (str) o un DataFrame")
 
+            # Aplicar limpieza robusta de datos después de cargar
+            self.original_data = self._robust_data_cleaning(self.original_data)
+
             self.processed_data = self.original_data.copy()
             self.preprocessing_steps.append(f"Datos cargados {source_desc} ({len(self.original_data)} filas)")
             return self.original_data
         except Exception as e:
             raise Exception(f"Error al cargar datos: {str(e)}")
+
+    def _robust_data_cleaning(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Limpieza robusta de datos para manejar formatos específicos"""
+        print("🧹 Aplicando limpieza robusta de datos...")
+
+        # Hacer una copia para no modificar el original
+        cleaned_df = df.copy()
+
+        # 1. Manejar valores faltantes representados de diferentes formas
+        missing_values = ['-', '--', 'nan', 'NaN', 'NULL', 'null', '', ' ']
+        cleaned_df.replace(missing_values, np.nan, inplace=True)
+
+        # 2. Convertir separadores decimales (coma a punto) para columnas numéricas
+        potential_numeric_columns = []
+        for col in cleaned_df.columns:
+            # Skip columnas que claramente no son numéricas
+            if col.lower() in ['fecha', 'hora', 'observaciones', '_source_file'] or 'fecha' in col.lower() or 'hora' in col.lower():
+                continue
+
+            # Verificar si la columna podría contener números
+            sample = cleaned_df[col].dropna().head(100)  # Tomar muestra
+            if len(sample) > 0:
+                # Verificar si contiene caracteres numéricos o comas/puntos
+                sample_str = sample.astype(str)
+                has_numbers = sample_str.str.contains(r'[0-9]', regex=True).any()
+                has_commas_or_dots = sample_str.str.contains(r'[,.]', regex=True).any()
+
+                if has_numbers or has_commas_or_dots:
+                    potential_numeric_columns.append(col)
+
+        # Procesar columnas potencialmente numéricas
+        for col in potential_numeric_columns:
+            try:
+                # Convertir a string primero
+                temp_series = cleaned_df[col].astype(str)
+
+                # Reemplazar comas por puntos para decimales
+                temp_series = temp_series.str.replace(',', '.', regex=False)
+
+                # Intentar convertir a numérico
+                numeric_series = pd.to_numeric(temp_series, errors='coerce')
+
+                # Solo convertir si al menos 50% de los valores son numéricos válidos
+                valid_ratio = numeric_series.notna().sum() / len(numeric_series)
+                if valid_ratio >= 0.5:
+                    cleaned_df[col] = numeric_series
+                    print(f"✅ Columna '{col}' convertida a numérica ({valid_ratio:.1%} valores válidos)")
+                else:
+                    print(f"⚠️  Columna '{col}' mantenida como texto (solo {valid_ratio:.1%} valores numéricos)")
+
+            except Exception as e:
+                print(f"⚠️  Error procesando columna '{col}': {e}")
+
+        # 3. Limpiar columnas de texto
+        for col in cleaned_df.select_dtypes(include=['object']).columns:
+            if col not in ['fecha', 'hora', 'observaciones', '_source_file']:
+                # Limpiar espacios extra y caracteres problemáticos
+                cleaned_df[col] = cleaned_df[col].astype(str).str.strip()
+
+        print("✅ Limpieza robusta de datos completada")
+        return cleaned_df
 
     def _get_relevant_columns(self, all_columns):
         """Determinar qué columnas son relevantes para el análisis meteorológico"""

@@ -491,6 +491,32 @@
                     </div>
                 </div>
                 {% endif %}
+
+                {% if results.prediction.plots.prediction_errors %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Análisis de Errores de Predicción</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="plot-container">
+                            <img src="{{ results.prediction.plots.prediction_errors }}" class="img-fluid" alt="Análisis de Errores de Predicción">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if results.prediction.plots.microclimate_analysis %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Análisis por Microclima</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="plot-container">
+                            <img src="{{ results.prediction.plots.microclimate_analysis }}" class="img-fluid" alt="Análisis por Microclima">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Summary Tab -->
