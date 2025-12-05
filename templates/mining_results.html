@@ -205,25 +205,62 @@
     </div>
 
     <div class="container">
+        <!-- Executive Summary Panel -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Dashboard Ejecutivo - Minería de Datos</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h2 class="text-primary">{{ results.preprocessing.summary.processed_shape[0] }}</h2>
+                                    <small class="text-muted">Registros Procesados</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h2 class="text-success">{{ results.clustering.optimal_clusters.silhouette_method }}</h2>
+                                    <small class="text-muted">Microclimas Identificados</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h2 class="text-info">{{ results.prediction.summary.models_trained|length }}</h2>
+                                    <small class="text-muted">Modelos Evaluados</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <h2 class="text-warning">{{ "%.1f"|format(results.prediction.summary.best_score * 100) }}%</h2>
+                                <small class="text-muted">Precisión del Mejor Modelo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs justify-content-center mb-4" id="miningTabs" role="tablist">
+        <ul class="nav nav-pills justify-content-center mb-4" id="miningTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="preprocessing-tab" data-bs-toggle="tab" data-bs-target="#preprocessing" type="button" role="tab">
+                <button class="nav-link active" id="preprocessing-tab" data-bs-toggle="pill" data-bs-target="#preprocessing" type="button" role="tab">
                     <i class="fas fa-database me-2"></i>1. Preprocesamiento
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="clustering-tab" data-bs-toggle="tab" data-bs-target="#clustering" type="button" role="tab">
+                <button class="nav-link" id="clustering-tab" data-bs-toggle="pill" data-bs-target="#clustering" type="button" role="tab">
                     <i class="fas fa-sitemap me-2"></i>2. Microclimas
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="prediction-tab" data-bs-toggle="tab" data-bs-target="#prediction" type="button" role="tab">
+                <button class="nav-link" id="prediction-tab" data-bs-toggle="pill" data-bs-target="#prediction" type="button" role="tab">
                     <i class="fas fa-brain me-2"></i>3. Predicción
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
+                <button class="nav-link" id="summary-tab" data-bs-toggle="pill" data-bs-target="#summary" type="button" role="tab">
                     <i class="fas fa-trophy me-2"></i>Resumen Ejecutivo
                 </button>
             </li>
@@ -414,109 +451,234 @@
                     <i class="fas fa-brain me-1"></i>Fase 3: Predicción de Precipitación
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Mejor Modelo de Predicción</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="text-center mb-3">
-                                    <h3 class="text-primary">{{ results.prediction.summary.best_model or 'N/A' }}</h3>
-                                    <div class="h5 text-success">{{ "%.3f"|format(results.prediction.summary.best_score) }} R²</div>
-                                </div>
-                                <hr>
-                                <div class="row text-center">
-                                    <div class="col-6">
-                                        <div class="h6 text-info">{{ results.prediction.summary.models_trained|length }}</div>
-                                        <small>Modelos Entrenados</small>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="h6 text-warning">{{ results.prediction.summary.feature_count }}</div>
-                                        <small>Características</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Panel 1: Resumen Ejecutivo de Predicción -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Panel Ejecutivo - Predicción de Precipitación</h5>
                     </div>
-
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Comparación de Modelos</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center border-end">
+                                    <h3 class="text-primary">{{ results.prediction.summary.best_model or 'N/A' }}</h3>
+                                    <small class="text-muted">Mejor Modelo</small>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                {% for model_name, model_result in results.prediction.model_results.items() %}
-                                    {% if model_result.metrics %}
-                                    <div class="model-performance mb-2">
-                                        <div style="min-width: 120px;">
-                                            <strong class="small">{{ model_name }}</strong>
-                                        </div>
-                                        <div class="performance-bar">
-                                            <div class="performance-fill" style="width: {{ (model_result.metrics.test_r2 * 100)|round }}%"></div>
-                                        </div>
-                                        <div class="small text-muted ms-2" style="min-width: 50px;">
-                                            {{ "%.2f"|format(model_result.metrics.test_r2) }}
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                {% endfor %}
+                            <div class="col-md-4">
+                                <div class="text-center border-end">
+                                    <h3 class="text-success">{{ "%.1f"|format(results.prediction.summary.best_score * 100) }}%</h3>
+                                    <small class="text-muted">Precisión (R²)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h3 class="text-info">{{ results.prediction.summary.models_trained|length }}</h3>
+                                    <small class="text-muted">Modelos Evaluados</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <div class="row">
+                    <!-- Panel 2: Rendimiento de Modelos -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Rendimiento de Modelos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Comparación de Precisión (R² Score)</h6>
+                                    {% for model_name, model_result in results.prediction.model_results.items() %}
+                                        {% if model_result.metrics %}
+                                        <div class="model-performance mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <strong class="small">{{ model_name }}</strong>
+                                                <small class="text-muted">{{ "%.3f"|format(model_result.metrics.test_r2) }}</small>
+                                            </div>
+                                            <div class="performance-bar">
+                                                <div class="performance-fill" style="width: {{ [0, (model_result.metrics.test_r2 * 100)|round, 100]|max }}%"></div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 3: Métricas Detalladas -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Métricas de Evaluación</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    {% for model_name, model_result in results.prediction.model_results.items() %}
+                                        {% if model_result.metrics and loop.index <= 4 %}
+                                        <div class="col-6 mb-3">
+                                            <div class="border rounded p-2">
+                                                <small class="text-muted d-block">{{ model_name }}</small>
+                                                <div class="h6 text-primary mb-1">{{ "%.3f"|format(model_result.metrics.test_r2) }}</div>
+                                                <small class="text-success">R²</small>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <hr>
+                                <div class="small text-muted">
+                                    <strong>Nota:</strong> Las métricas se calculan en conjunto de prueba (20% de los datos)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Visualizaciones de Modelos -->
                 {% if results.prediction.plots.model_comparison %}
-                <div class="card mt-3">
+                <div class="card mt-4">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Análisis de Rendimiento de Modelos</h5>
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Visualización Comparativa de Modelos</h5>
                     </div>
                     <div class="card-body">
                         <div class="plot-container">
                             <img src="{{ results.prediction.plots.model_comparison }}" class="img-fluid" alt="Comparación de Modelos">
                         </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if results.prediction.plots.feature_importance %}
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Importancia de Características</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="plot-container">
-                            <img src="{{ results.prediction.plots.feature_importance }}" class="img-fluid" alt="Importancia de Características">
+                        <div class="mt-2 small text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Gráfico que compara R², MAE y RMSE de todos los modelos evaluados
                         </div>
                     </div>
                 </div>
                 {% endif %}
 
-                {% if results.prediction.plots.prediction_errors %}
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Análisis de Errores de Predicción</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="plot-container">
-                            <img src="{{ results.prediction.plots.prediction_errors }}" class="img-fluid" alt="Análisis de Errores de Predicción">
+                <div class="row mt-4">
+                    <!-- Panel 5: Importancia de Características -->
+                    {% if results.prediction.plots.feature_importance %}
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-star me-2"></i>Importancia de Variables</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="plot-container">
+                                    <img src="{{ results.prediction.plots.feature_importance }}" class="img-fluid" alt="Importancia de Características">
+                                </div>
+                                <div class="mt-2 small text-muted">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Variables más influyentes en las predicciones
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% endif %}
+                    {% endif %}
 
+                    <!-- Panel 6: Análisis de Errores -->
+                    {% if results.prediction.plots.prediction_errors %}
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Análisis de Errores</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="plot-container">
+                                    <img src="{{ results.prediction.plots.prediction_errors }}" class="img-fluid" alt="Análisis de Errores">
+                                </div>
+                                <div class="mt-2 small text-muted">
+                                    <i class="fas fa-chart-area me-1"></i>
+                                    Distribución de errores y validación de normalidad
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Panel 7: Análisis por Microclimas -->
                 {% if results.prediction.plots.microclimate_analysis %}
-                <div class="card mt-3">
+                <div class="card mt-4">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Análisis por Microclima</h5>
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Análisis Predictivo por Microclimas</h5>
                     </div>
                     <div class="card-body">
-                        <div class="plot-container">
-                            <img src="{{ results.prediction.plots.microclimate_analysis }}" class="img-fluid" alt="Análisis por Microclima">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="plot-container">
+                                    <img src="{{ results.prediction.plots.microclimate_analysis }}" class="img-fluid" alt="Análisis por Microclima">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <h6>Interpretación:</h6>
+                                <ul class="small">
+                                    <li><strong>Precipitación por Microclima:</strong> Variaciones climáticas locales</li>
+                                    <li><strong>Distribución de Datos:</strong> Cantidad de registros por zona</li>
+                                    <li><strong>Predicciones Específicas:</strong> Modelos adaptados a cada microclima</li>
+                                </ul>
+                                <div class="alert alert-info small mt-3">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Cada microclima tiene características únicas que afectan las predicciones de precipitación.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
+
+                <!-- Panel 8: Insights y Recomendaciones -->
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Insights de Predicción</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-success">
+                                    <h6><i class="fas fa-check-circle me-2"></i>Modelo Óptimo Seleccionado</h6>
+                                    <p class="mb-0 small">{{ results.prediction.summary.best_model or 'N/A' }} con {{ "%.1f"|format(results.prediction.summary.best_score * 100) }}% de precisión</p>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-brain me-2"></i>Algoritmos Evaluados</h6>
+                                    <p class="mb-0 small">7 modelos ML comparados con validación cruzada</p>
+                                </div>
+
+                                {% if results.prediction.summary.feature_count %}
+                                <div class="alert alert-warning">
+                                    <h6><i class="fas fa-star me-2"></i>Variables Predictoras</h6>
+                                    <p class="mb-0 small">{{ results.prediction.summary.feature_count }} características utilizadas en el modelo</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Recomendaciones</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-primary">
+                                    <h6><i class="fas fa-tools me-2"></i>Optimización Sugerida</h6>
+                                    <p class="mb-0 small">Considerar ajuste de hiperparámetros para mejorar la precisión</p>
+                                </div>
+
+                                <div class="alert alert-secondary">
+                                    <h6><i class="fas fa-database me-2"></i>Datos Adicionales</h6>
+                                    <p class="mb-0 small">Más datos históricos mejorarían la robustez del modelo</p>
+                                </div>
+
+                                <div class="alert alert-dark">
+                                    <h6><i class="fas fa-chart-line me-2"></i>Monitoreo Continuo</h6>
+                                    <p class="mb-0 small">Reentrenar modelo periódicamente con nuevos datos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Summary Tab -->
