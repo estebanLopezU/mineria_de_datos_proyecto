@@ -4,10 +4,18 @@ Este proyecto es una herramienta de optimización para PC desarrollada en Python
 
 ## Características
 
+### Optimizaciones Básicas
 - Obtención de información del sistema (CPU, memoria, disco)
 - Limpieza de archivos temporales
 - Vaciado de la papelera de reciclaje
 - Lista de programas de inicio
+
+### Optimizaciones Avanzadas
+- Desfragmentación de disco duro
+- Limpieza de archivos prefetch
+- Limpieza de cache de navegadores (Chrome, Firefox)
+- Limpieza de archivos temporales de Windows Update
+- Cálculo estimado de espacio liberado
 
 ## Requisitos
 
