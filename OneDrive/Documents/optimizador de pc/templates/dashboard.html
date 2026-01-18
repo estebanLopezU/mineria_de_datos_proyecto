@@ -1235,17 +1235,28 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             const deltaY = currentY - dragStartY;
 
             const aiAssistant = document.querySelector('.ai-assistant');
-            const dashboardContainer = document.querySelector('.container');
 
-            // Calculate relative position within the dashboard container
-            const containerRect = dashboardContainer.getBoundingClientRect();
+            // Find the closest container (card or main content area)
+            const cardContainer = aiAssistant.closest('.card');
+            const dashboardContainer = document.querySelector('.main-content') || document.querySelector('.container-fluid');
+
+            const container = cardContainer || dashboardContainer;
+            if (!container) return;
+
+            // Calculate relative position within the container
+            const containerRect = container.getBoundingClientRect();
             const assistantRect = aiAssistant.getBoundingClientRect();
 
-            const newX = Math.max(containerRect.left, Math.min(initialX + deltaX, containerRect.right - assistantRect.width));
-            const newY = Math.max(containerRect.top, Math.min(initialY + deltaY, containerRect.bottom - assistantRect.height));
+            // Constrain movement within container bounds with padding
+            const padding = 20;
+            const maxX = containerRect.width - assistantRect.width - padding;
+            const maxY = containerRect.height - assistantRect.height - padding;
 
-            // Move within dashboard bounds (not viewport)
-            aiAssistant.style.transform = `translate(${newX - initialX}px, ${newY - initialY}px)`;
+            const translateX = Math.max(-padding, Math.min(deltaX, maxX));
+            const translateY = Math.max(-padding, Math.min(deltaY, maxY));
+
+            // Apply transform for smooth movement
+            aiAssistant.style.transform = `translate(${translateX}px, ${translateY}px)`;
         }
 
         function endDrag() {
