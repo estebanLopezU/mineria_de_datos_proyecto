@@ -44,6 +44,16 @@ Accede al dashboard para ver estadísticas en tiempo real del sistema:
 - **Procesos**: Número de procesos activos
 - **Información del sistema**: Uptime, versión del SO, etc.
 
+## 🤖 Asistente IA OptiBot
+El dashboard incluye un asistente inteligente que:
+- **Analiza automáticamente** el rendimiento de tu sistema
+- **Genera recomendaciones** personalizadas basadas en estadísticas
+- **Responde preguntas** sobre optimización y componentes de PC
+- **Explica estadísticas** en tiempo real
+- **Proporciona consejos** preventivos de mantenimiento
+
+Pregúntale sobre CPU, memoria, disco, red, procesos, o cualquier aspecto de tu PC.
+
 Si prefieres ejecutar solo la versión web sin auto-abrir navegador:
 ```
 python app.py

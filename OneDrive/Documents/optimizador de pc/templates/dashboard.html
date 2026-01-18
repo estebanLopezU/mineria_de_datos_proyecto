@@ -79,6 +79,25 @@
             </div>
         </div>
 
+        <!-- AI Assistant Section -->
+        <div class="ai-assistant">
+            <h3>🤖 Asistente IA - OptiBot</h3>
+            <div class="ai-chat-container">
+                <div class="ai-recommendations" id="aiRecommendations">
+                    <div class="ai-message ai-bot">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-content">
+                            <strong>OptiBot:</strong> Analizando tu sistema... Espera las recomendaciones inteligentes.
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-chat-input">
+                    <input type="text" id="aiQuestion" placeholder="Pregúntame sobre tu PC o el rendimiento..." />
+                    <button onclick="askAI()">Preguntar</button>
+                </div>
+            </div>
+        </div>
+
         <div class="dashboard-actions">
             <a href="/" class="btn-secondary">Volver al Optimizador</a>
             <button onclick="resetCharts()" class="btn-secondary">Reiniciar Gráficos</button>
@@ -313,6 +332,200 @@
             networkChart.data.datasets[0].data = [];
             networkChart.data.datasets[1].data = [];
             networkChart.update();
+        }
+
+        // AI Assistant Variables
+        let currentStats = null;
+        let aiMessageCount = 0;
+
+        // AI Response function
+        function generateAIResponse(question, stats) {
+            const q = question.toLowerCase().trim();
+
+            // Análisis inteligente basado en estadísticas
+            let response = '';
+
+            if (q.includes('cpu') || q.includes('procesador')) {
+                if (stats.cpu.percent > 80) {
+                    response = `⚠️ Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, lo cual es alto. Te recomiendo cerrar programas innecesarios y ejecutar la optimización de procesos.`;
+                } else if (stats.cpu.percent > 50) {
+                    response = `📊 Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, funcionando normalmente. Si notas lentitud, considera limpiar archivos temporales.`;
+                } else {
+                    response = `✅ Tu CPU está funcionando óptimamente al ${stats.cpu.percent.toFixed(1)}%. ¡Excelente rendimiento!`;
+                }
+            } else if (q.includes('memoria') || q.includes('ram')) {
+                if (stats.memory.percent > 85) {
+                    response = `🚨 Tu memoria RAM está casi llena (${stats.memory.percent.toFixed(1)}%). Cierra aplicaciones innecesarias y ejecuta la limpieza de memoria.`;
+                } else if (stats.memory.percent > 70) {
+                    response = `⚠️ Tu memoria RAM está al ${stats.memory.percent.toFixed(1)}%. Considera cerrar algunos programas para mejorar el rendimiento.`;
+                } else {
+                    response = `✅ Tu memoria RAM está en buen estado (${stats.memory.percent.toFixed(1)}% de uso).`;
+                }
+            } else if (q.includes('disco') || q.includes('almacenamiento')) {
+                if (stats.disk.percent > 90) {
+                    response = `🚨 ¡Tu disco está casi lleno (${stats.disk.percent.toFixed(1)}%)! Te recomiendo ejecutar todas las optimizaciones de limpieza inmediatamente.`;
+                } else if (stats.disk.percent > 75) {
+                    response = `⚠️ Tu disco tiene ${stats.disk.percent.toFixed(1)}% de uso. Considera limpiar archivos temporales y la papelera de reciclaje.`;
+                } else {
+                    response = `✅ Tu disco tiene buen espacio disponible (${(100 - stats.disk.percent).toFixed(1)}% libre).`;
+                }
+            } else if (q.includes('red') || q.includes('internet') || q.includes('conexión')) {
+                response = `📡 Has enviado ${stats.network.sent} MB y recibido ${stats.network.recv} MB de datos. Si tienes problemas de conexión, verifica tu configuración de red.`;
+            } else if (q.includes('optimizar') || q.includes('mejorar')) {
+                response = `🚀 Para optimizar tu PC, te recomiendo ejecutar: limpieza de archivos temporales, desfragmentación de disco, y limpieza de cache de navegadores. Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, memoria al ${stats.memory.percent.toFixed(1)}%, y disco al ${stats.disk.percent.toFixed(1)}%.`;
+            } else if (q.includes('procesos') || q.includes('programas')) {
+                response = `📋 Tienes ${stats.processes} procesos activos corriendo. Si son muchos, considera cerrar aplicaciones innecesarias para mejorar el rendimiento.`;
+            } else if (q.includes('ayuda') || q.includes('qué puedes') || q.includes('hacer')) {
+                response = `🤖 ¡Hola! Soy OptiBot, tu asistente de optimización. Puedo analizar el rendimiento de tu CPU, memoria, disco y red en tiempo real. Solo pregúntame sobre cualquier componente de tu PC y te daré recomendaciones personalizadas. También puedo explicarte qué significan las estadísticas que ves en los gráficos.`;
+            } else if (q.includes('gracias') || q.includes('thank')) {
+                response = `🙂 ¡De nada! Estoy aquí para ayudarte a mantener tu PC funcionando al máximo rendimiento. Si tienes más preguntas sobre optimización, ¡no dudes en preguntar!`;
+            } else if (q.includes('hola') || q.includes('hi') || q.includes('hello')) {
+                response = `👋 ¡Hola! Soy OptiBot, tu asistente inteligente de optimización de PC. Estoy monitoreando tu sistema en tiempo real. ¿En qué puedo ayudarte hoy?`;
+            } else {
+                response = `🤔 No entendí completamente tu pregunta. Puedo ayudarte con información sobre CPU, memoria RAM, disco duro, red, procesos activos, y recomendaciones de optimización. También puedo explicar cualquier estadística que veas en el dashboard. ¡Prueba preguntarme algo específico!`;
+            }
+
+            return response;
+        }
+
+        // Add AI message to chat
+        function addAIMessage(message, isUser = false) {
+            const chatContainer = document.getElementById('aiRecommendations');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `ai-message ${isUser ? 'ai-user' : 'ai-bot'}`;
+
+            messageDiv.innerHTML = `
+                <div class="ai-avatar">${isUser ? '👤' : '🤖'}</div>
+                <div class="ai-content">
+                    <strong>${isUser ? 'Tú' : 'OptiBot'}:</strong> ${message}
+                </div>
+            `;
+
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            aiMessageCount++;
+
+            // Limit messages to prevent overflow
+            if (aiMessageCount > 10) {
+                chatContainer.removeChild(chatContainer.firstChild);
+                aiMessageCount--;
+            }
+        }
+
+        // Generate AI recommendations based on stats
+        function generateAIRecommendations(stats) {
+            let recommendations = [];
+
+            if (stats.cpu.percent > 80) {
+                recommendations.push("🔥 CPU muy alta: Cierra programas innecesarios");
+            }
+
+            if (stats.memory.percent > 85) {
+                recommendations.push("💾 Memoria baja: Libera RAM cerrando aplicaciones");
+            }
+
+            if (stats.disk.percent > 90) {
+                recommendations.push("💿 Disco casi lleno: Ejecuta limpieza urgente");
+            }
+
+            if (stats.processes > 150) {
+                recommendations.push("⚙️ Muchos procesos: Revisa el administrador de tareas");
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push("✅ Tu sistema está funcionando bien");
+                recommendations.push("💡 Recomiendo ejecutar optimizaciones preventivas semanalmente");
+            }
+
+            return recommendations;
+        }
+
+        // Ask AI function
+        function askAI() {
+            const input = document.getElementById('aiQuestion');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            // Add user message
+            addAIMessage(question, true);
+
+            // Generate AI response
+            const response = generateAIResponse(question, currentStats);
+
+            // Add AI response with slight delay for natural feel
+            setTimeout(() => {
+                addAIMessage(response);
+            }, 500);
+
+            // Clear input
+            input.value = '';
+        }
+
+        // Allow Enter key to send message
+        document.getElementById('aiQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askAI();
+            }
+        });
+
+        // Update charts with new data
+        function updateCharts(data) {
+            currentStats = data; // Store for AI use
+            const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
+
+            // CPU
+            cpuData.push(data.cpu.percent);
+            if (cpuData.length > maxDataPoints) cpuData.shift();
+            cpuChart.data.labels = Array.from({length: cpuData.length}, (_, i) => i);
+            cpuChart.data.datasets[0].data = cpuData;
+            cpuChart.update();
+
+            document.getElementById('cpuPercent').textContent = data.cpu.percent.toFixed(1) + '%';
+            document.getElementById('cpuFreq').textContent = (data.cpu.freq_current / 1000).toFixed(2) + ' GHz';
+
+            // Memory
+            memoryChart.data.datasets[0].data = [data.memory.percent, 100 - data.memory.percent];
+            memoryChart.update();
+
+            document.getElementById('memoryUsed').textContent = data.memory.used + ' GB';
+            document.getElementById('memoryTotal').textContent = data.memory.total + ' GB';
+
+            // Disk
+            diskChart.data.datasets[0].data = [data.disk.percent, 100 - data.disk.percent];
+            diskChart.update();
+
+            document.getElementById('diskUsed').textContent = data.disk.used + ' GB';
+            document.getElementById('diskTotal').textContent = data.disk.total + ' GB';
+
+            // Network
+            if (networkData.length === 0) {
+                networkData.push({sent: data.network.sent, recv: data.network.recv});
+            } else {
+                networkData.push({
+                    sent: data.network.sent - networkData[networkData.length - 1].sent,
+                    recv: data.network.recv - networkData[networkData.length - 1].recv
+                });
+            }
+            if (networkData.length > maxDataPoints) networkData.shift();
+
+            networkChart.data.labels = Array.from({length: networkData.length}, (_, i) => i);
+            networkChart.data.datasets[0].data = networkData.map(d => d.sent);
+            networkChart.data.datasets[1].data = networkData.map(d => d.recv);
+            networkChart.update();
+
+            document.getElementById('netSent').textContent = data.network.sent + ' MB';
+            document.getElementById('netRecv').textContent = data.network.recv + ' MB';
+
+            // System info
+            document.getElementById('processCount').textContent = data.processes;
+
+            // Update AI recommendations every few updates
+            if (aiMessageCount === 1) { // Only initial message
+                const recommendations = generateAIRecommendations(data);
+                const recMessage = "💡 **Recomendaciones inteligentes:**<br>" + recommendations.join('<br>');
+                document.querySelector('.ai-content').innerHTML = `<strong>OptiBot:</strong> ${recMessage}`;
+            }
         }
 
         // Initialize on page load
