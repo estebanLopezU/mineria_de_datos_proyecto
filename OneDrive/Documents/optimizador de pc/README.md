@@ -35,6 +35,35 @@ python main.py
 ```
 Esto iniciará automáticamente la interfaz web y abrirá tu navegador en http://127.0.0.1:5000/
 
+## 🏠 Página Principal Moderna
+
+La página principal cuenta con un diseño profesional construido con **Bootstrap 5**:
+
+### **🚀 Hero Section Interactiva**
+- **Visualización 3D** del sistema optimizado con disco duro animado
+- **Llamados a la acción** prominentes para comenzar la optimización
+- **Gradientes modernos** y animaciones flotantes
+- **Texto persuasivo** que explica los beneficios
+
+### **💎 Tarjetas de Características**
+- **3 tarjetas principales** destacando las funcionalidades clave
+- **Iconos Bootstrap** expresivos y colores temáticos
+- **Animaciones hover** con efectos de elevación
+- **Descripciones detalladas** de cada característica
+
+### **📋 Formulario de Optimización Mejorado**
+- **Diseño de tarjeta premium** con header profesional
+- **Organización por secciones** (Básico/Avanzado)
+- **Opciones visuales atractivas** con iconos y descripciones
+- **Botones de acción** para selección rápida (Seleccionar Todo/Limpiar)
+- **Feedback visual** en tiempo real
+
+### **🧭 Navegación Completa**
+- **Navbar responsivo** con collapse para móviles
+- **Navegación por secciones** con anclas suaves
+- **Enlaces directos** al dashboard y características
+- **Footer informativo** con detalles del desarrollador
+
 ## 🎨 Dashboard Moderno con Bootstrap
 
 ### **Interfaz Profesional y Responsiva**
