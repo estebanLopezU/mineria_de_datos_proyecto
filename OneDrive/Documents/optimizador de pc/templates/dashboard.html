@@ -4,130 +4,391 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Optimizador de PC</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Dashboard de Rendimiento del Sistema</h1>
-        <p>Monitoreo en tiempo real de los recursos del sistema</p>
+    <!-- Sidebar Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Optimizador PC
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="bi bi-house-door me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#optimizacion">
+                            <i class="bi bi-gear me-1"></i>Optimización
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#chat">
+                            <i class="bi bi-chat-dots me-1"></i>Chat IA
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>Usuario
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/">Volver al Inicio</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="resetCharts()">Reiniciar Dashboard</a></li>
+                        </ul>
+                    </li>
+                </ul>
+    </div>
+    </nav>
 
-        <div class="dashboard-grid">
-            <!-- CPU Chart -->
-            <div class="chart-card">
-                <h3>CPU</h3>
-                <div class="chart-container">
-                    <canvas id="cpuChart"></canvas>
-                </div>
-                <div class="stats">
-                    <span id="cpuPercent">0%</span>
-                    <span id="cpuFreq">0 GHz</span>
-                </div>
-            </div>
+    <div class="container-fluid" style="margin-top: 76px;">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
+                <div class="position-sticky pt-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>MENÚ PRINCIPAL</span>
+                    </h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="bi bi-tools me-2"></i>
+                                Optimización
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#chat">
+                                <i class="bi bi-robot me-2"></i>
+                                OptiBot IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#system">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Sistema
+                            </a>
+                        </li>
+                    </ul>
 
-            <!-- Memory Chart -->
-            <div class="chart-card">
-                <h3>Memoria RAM</h3>
-                <div class="chart-container">
-                    <canvas id="memoryChart"></canvas>
-                </div>
-                <div class="stats">
-                    <span id="memoryUsed">0 GB</span> / <span id="memoryTotal">0 GB</span>
-                </div>
-            </div>
-
-            <!-- Disk Chart -->
-            <div class="chart-card">
-                <h3>Disco Duro</h3>
-                <div class="chart-container">
-                    <canvas id="diskChart"></canvas>
-                </div>
-                <div class="stats">
-                    <span id="diskUsed">0 GB</span> / <span id="diskTotal">0 GB</span>
-                </div>
-            </div>
-
-            <!-- Network Chart -->
-            <div class="chart-card">
-                <h3>Red</h3>
-                <div class="chart-container">
-                    <canvas id="networkChart"></canvas>
-                </div>
-                <div class="stats">
-                    <span id="netSent">0 MB</span> enviado<br>
-                    <span id="netRecv">0 MB</span> recibido
-                </div>
-            </div>
-        </div>
-
-        <div class="system-info">
-            <h3>Información del Sistema</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>Procesos Activos:</strong> <span id="processCount">0</span>
-                </div>
-                <div class="info-item">
-                    <strong>Tiempo de Actividad:</strong> <span id="uptime">0</span>
-                </div>
-                <div class="info-item">
-                    <strong>Versión de Python:</strong> <span id="pythonVersion">-</span>
-                </div>
-                <div class="info-item">
-                    <strong>Sistema Operativo:</strong> <span id="osVersion">-</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Assistant Section -->
-        <div class="ai-assistant">
-            <h3>🤖 Chat con OptiBot - Tu Asistente IA</h3>
-            <div class="ai-chat-container">
-                <div class="ai-chat-messages" id="aiChatMessages">
-                    <div class="ai-message ai-bot welcome-message">
-                        <div class="ai-avatar">🤖</div>
-                        <div class="ai-content">
-                            <strong>OptiBot:</strong> ¡Hola! Soy tu asistente inteligente de optimización. Estoy monitoreando tu PC en tiempo real.<br><br>
-                            <strong>Estado actual:</strong><br>
-                            • CPU: <span id="welcomeCpu">--</span>%<br>
-                            • Memoria: <span id="welcomeMemory">--</span>%<br>
-                            • Disco: <span id="welcomeDisk">--</span>%<br><br>
-                            ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre optimización, rendimiento, o cualquier tema. ¡Solo escribe tu mensaje!
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>ESTADO DEL SISTEMA</span>
+                    </h6>
+                    <div class="px-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-cpu text-primary me-2"></i>
+                            <small>CPU: <span id="sidebarCpuPercent">--</span>%</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-memory text-success me-2"></i>
+                            <small>RAM: <span id="sidebarMemoryPercent">--</span>%</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-hdd text-warning me-2"></i>
+                            <small>Disco: <span id="sidebarDiskPercent">--</span>%</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-wifi text-info me-2"></i>
+                            <small>Procesos: <span id="sidebarProcessCount">--</span></small>
                         </div>
                     </div>
                 </div>
-                <div class="ai-chat-input-container">
-                    <div class="ai-emoji-bar">
-                        <button onclick="addEmoji('😊')" title="Feliz">😊</button>
-                        <button onclick="addEmoji('👍')" title="Me gusta">👍</button>
-                        <button onclick="addEmoji('❤️')" title="Corazón">❤️</button>
-                        <button onclick="addEmoji('😂')" title="Risa">😂</button>
-                        <button onclick="addEmoji('😮')" title="Sorprendido">😮</button>
-                        <button onclick="addEmoji('🙏')" title="Gracias">🙏</button>
-                        <button onclick="addEmoji('🔧')" title="Herramientas">🔧</button>
-                        <button onclick="addEmoji('💻')" title="Computadora">💻</button>
-                    </div>
-                    <div class="ai-chat-input">
-                        <input type="text" id="aiMessage" placeholder="Escribe tu mensaje aquí..." />
-                        <button onclick="sendMessage()" id="sendButton">
-                            <span id="sendIcon">📤</span>
-                        </button>
-                    </div>
-                    <div class="ai-chat-status">
-                        <span id="typingIndicator" style="display: none;">
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                            OptiBot está escribiendo...
-                        </span>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-speedometer2 text-primary me-2"></i>
+                        Dashboard de Rendimiento
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetCharts()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Reiniciar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.location.href='/'">
+                                <i class="bi bi-tools me-1"></i>Optimizar
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="dashboard-actions">
-            <a href="/" class="btn-secondary">Volver al Optimizador</a>
-            <button onclick="resetCharts()" class="btn-secondary">Reiniciar Gráficos</button>
+                <!-- System Overview Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-primary h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 text-primary mb-2">
+                                    <i class="bi bi-cpu"></i>
+                                </div>
+                                <h5 class="card-title">CPU</h5>
+                                <h3 class="text-primary" id="cpuPercentCard">--%</h3>
+                                <p class="text-muted small mb-0">Frecuencia: <span id="cpuFreqCard">--</span> GHz</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-success h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 text-success mb-2">
+                                    <i class="bi bi-memory"></i>
+                                </div>
+                                <h5 class="card-title">Memoria RAM</h5>
+                                <h3 class="text-success" id="memoryPercentCard">--%</h3>
+                                <p class="text-muted small mb-0">
+                                    <span id="memoryUsedCard">--</span> / <span id="memoryTotalCard">--</span> GB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-warning h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 text-warning mb-2">
+                                    <i class="bi bi-hdd"></i>
+                                </div>
+                                <h5 class="card-title">Disco Duro</h5>
+                                <h3 class="text-warning" id="diskPercentCard">--%</h3>
+                                <p class="text-muted small mb-0">
+                                    <span id="diskUsedCard">--</span> / <span id="diskTotalCard">--</span> GB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-info h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 text-info mb-2">
+                                    <i class="bi bi-wifi"></i>
+                                </div>
+                                <h5 class="card-title">Procesos</h5>
+                                <h3 class="text-info" id="processCountCard">--</h3>
+                                <p class="text-muted small mb-0">Activos en el sistema</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-graph-up text-primary me-2"></i>
+                                    Monitoreo en Tiempo Real
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container mb-4">
+                                    <canvas id="cpuChart" height="200"></canvas>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <h6 class="text-muted">CPU Promedio</h6>
+                                        <h4 class="text-primary" id="cpuAvg">--%</h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6 class="text-muted">Pico Máximo</h6>
+                                        <h4 class="text-danger" id="cpuMax">--%</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Memoria RAM</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="memoryChart" height="150"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Disco Duro</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="diskChart" height="150"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Actividad de Red</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="networkChart" height="120"></canvas>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">
+                                                Enviado: <span id="netSent">--</span> MB | 
+                                                Recibido: <span id="netRecv">--</span> MB
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="row mb-4" id="system">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-info-circle text-info me-2"></i>
+                                    Información del Sistema
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-clock-history text-primary fs-4 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold">Tiempo de Actividad</div>
+                                                <div id="uptime">-- horas</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-terminal text-success fs-4 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold">Python</div>
+                                                <div id="pythonVersion">3.x</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-window text-info fs-4 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold">Sistema</div>
+                                                <div id="osVersion">--</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-lightning text-warning fs-4 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold">Estado General</div>
+                                                <div class="badge bg-success" id="systemStatus">Excelente</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Assistant Section -->
+                <div class="row" id="chat">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-robot text-primary me-2"></i>
+                                    Chat con OptiBot - Tu Asistente IA
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="ai-chat-container">
+                                    <div class="ai-chat-messages" id="aiChatMessages">
+                                        <div class="ai-message ai-bot welcome-message">
+                                            <div class="ai-avatar">🤖</div>
+                                            <div class="ai-content">
+                                                <div class="ai-message-header">
+                                                    <strong>OptiBot</strong>
+                                                    <span class="ai-timestamp">--:--</span>
+                                                </div>
+                                                <div class="ai-message-text">
+                                                    ¡Hola! Soy tu asistente inteligente de optimización. Estoy monitoreando tu PC en tiempo real.<br><br>
+                                                    <strong>Estado actual:</strong><br>
+                                                    • CPU: <span id="welcomeCpu">--</span>%<br>
+                                                    • Memoria: <span id="welcomeMemory">--</span>%<br>
+                                                    • Disco: <span id="welcomeDisk">--</span>%<br><br>
+                                                    ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre optimización, rendimiento, o cualquier tema. ¡Solo escribe tu mensaje!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ai-chat-input-container">
+                                        <div class="ai-emoji-bar">
+                                            <button onclick="addEmoji('😊')" title="Feliz">😊</button>
+                                            <button onclick="addEmoji('👍')" title="Me gusta">👍</button>
+                                            <button onclick="addEmoji('❤️')" title="Corazón">❤️</button>
+                                            <button onclick="addEmoji('😂')" title="Risa">😂</button>
+                                            <button onclick="addEmoji('😮')" title="Sorprendido">😮</button>
+                                            <button onclick="addEmoji('🙏')" title="Gracias">🙏</button>
+                                            <button onclick="addEmoji('🔧')" title="Herramientas">🔧</button>
+                                            <button onclick="addEmoji('💻')" title="Computadora">💻</button>
+                                        </div>
+                                        <div class="ai-chat-input">
+                                            <input type="text" id="aiMessage" placeholder="Escribe tu mensaje aquí..." class="form-control" />
+                                            <button onclick="sendMessage()" id="sendButton" class="btn btn-primary">
+                                                <span id="sendIcon">📤</span>
+                                            </button>
+                                        </div>
+                                        <div class="ai-chat-status">
+                                            <span id="typingIndicator" style="display: none;">
+                                                <span class="typing-dot"></span>
+                                                <span class="typing-dot"></span>
+                                                <span class="typing-dot"></span>
+                                                OptiBot está escribiendo...
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
         </div>
     </div>
 
@@ -1072,4 +1333,5 @@ Como asistente inteligente, puedo ayudarte con información sobre:
         });
     </script>
 </body>
-</html>        });
+</html>
+
