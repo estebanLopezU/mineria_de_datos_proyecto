@@ -37,14 +37,21 @@ def limpiar_archivos_temporales():
 def vaciar_papelera():
     """Vacía la papelera de reciclaje en Windows."""
     try:
-        # Comando para Windows
-        result = subprocess.run(['cmd', '/c', 'rd /s /q %systemdrive%\\$Recycle.bin'], capture_output=True, text=True)
+        # Intentar con PowerShell primero (funciona para usuario actual sin admin)
+        result = subprocess.run(['powershell', '-Command', 'Clear-RecycleBin -Force -Confirm:$false'], capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
-            return {"exito": True, "mensaje": "Papelera vaciada exitosamente."}
+            return {"exito": True, "mensaje": "Papelera vaciada exitosamente con PowerShell."}
         else:
-            return {"exito": False, "mensaje": f"Error: {result.stderr}"}
+            # Fallback al comando rd tradicional
+            result2 = subprocess.run(['cmd', '/c', 'rd /s /q %systemdrive%\\$Recycle.bin 2>nul'], capture_output=True, text=True)
+            if result2.returncode == 0:
+                return {"exito": True, "mensaje": "Papelera vaciada exitosamente."}
+            else:
+                return {"exito": False, "mensaje": "Error: No se pudo vaciar la papelera. Ejecuta la aplicación como administrador para esta función."}
+    except subprocess.TimeoutExpired:
+        return {"exito": False, "mensaje": "Operación tomó demasiado tiempo."}
     except Exception as e:
-        return {"exito": False, "mensaje": str(e)}
+        return {"exito": False, "mensaje": f"Error: {str(e)}. Puede requerir permisos de administrador."}
 
 def obtener_programas_inicio():
     """Obtiene lista de programas de inicio."""
