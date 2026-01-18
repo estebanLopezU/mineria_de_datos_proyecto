@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Optimizador de PC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard de Rendimiento del Sistema</h1>
+        <p>Monitoreo en tiempo real de los recursos del sistema</p>
+
+        <div class="dashboard-grid">
+            <!-- CPU Chart -->
+            <div class="chart-card">
+                <h3>CPU</h3>
+                <div class="chart-container">
+                    <canvas id="cpuChart"></canvas>
+                </div>
+                <div class="stats">
+                    <span id="cpuPercent">0%</span>
+                    <span id="cpuFreq">0 GHz</span>
+                </div>
+            </div>
+
+            <!-- Memory Chart -->
+            <div class="chart-card">
+                <h3>Memoria RAM</h3>
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+                <div class="stats">
+                    <span id="memoryUsed">0 GB</span> / <span id="memoryTotal">0 GB</span>
+                </div>
+            </div>
+
+            <!-- Disk Chart -->
+            <div class="chart-card">
+                <h3>Disco Duro</h3>
+                <div class="chart-container">
+                    <canvas id="diskChart"></canvas>
+                </div>
+                <div class="stats">
+                    <span id="diskUsed">0 GB</span> / <span id="diskTotal">0 GB</span>
+                </div>
+            </div>
+
+            <!-- Network Chart -->
+            <div class="chart-card">
+                <h3>Red</h3>
+                <div class="chart-container">
+                    <canvas id="networkChart"></canvas>
+                </div>
+                <div class="stats">
+                    <span id="netSent">0 MB</span> enviado<br>
+                    <span id="netRecv">0 MB</span> recibido
+                </div>
+            </div>
+        </div>
+
+        <div class="system-info">
+            <h3>Información del Sistema</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Procesos Activos:</strong> <span id="processCount">0</span>
+                </div>
+                <div class="info-item">
+                    <strong>Tiempo de Actividad:</strong> <span id="uptime">0</span>
+                </div>
+                <div class="info-item">
+                    <strong>Versión de Python:</strong> <span id="pythonVersion">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>Sistema Operativo:</strong> <span id="osVersion">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-actions">
+            <a href="/" class="btn-secondary">Volver al Optimizador</a>
+            <button onclick="resetCharts()" class="btn-secondary">Reiniciar Gráficos</button>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js configurations
+        let cpuChart, memoryChart, diskChart, networkChart;
+        let cpuData = [], memoryData = [], diskData = [], networkData = [];
+        const maxDataPoints = 20;
+
+        // Initialize charts
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#ecf0f1'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#ecf0f1'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ecf0f1'
+                        }
+                    }
+                }
+            };
+
+            // CPU Chart
+            cpuChart = new Chart(document.getElementById('cpuChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'CPU %',
+                        data: cpuData,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: {
+                            ...chartOptions.scales.y,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Memory Chart
+            memoryChart = new Chart(document.getElementById('memoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usado', 'Libre'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#e74c3c', '#27ae60'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ecf0f1'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Disk Chart
+            diskChart = new Chart(document.getElementById('diskChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usado', 'Libre'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#f39c12', '#9b59b6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ecf0f1'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Network Chart
+            networkChart = new Chart(document.getElementById('networkChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Enviado (MB)',
+                        data: [],
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Recibido (MB)',
+                        data: [],
+                        borderColor: '#1abc9c',
+                        backgroundColor: 'rgba(26, 188, 156, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: chartOptions
+            });
+        }
+
+        // Update charts with new data
+        function updateCharts(data) {
+            const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
+
+            // CPU
+            cpuData.push(data.cpu.percent);
+            if (cpuData.length > maxDataPoints) cpuData.shift();
+            cpuChart.data.labels = Array.from({length: cpuData.length}, (_, i) => i);
+            cpuChart.data.datasets[0].data = cpuData;
+            cpuChart.update();
+
+            document.getElementById('cpuPercent').textContent = data.cpu.percent.toFixed(1) + '%';
+            document.getElementById('cpuFreq').textContent = (data.cpu.freq_current / 1000).toFixed(2) + ' GHz';
+
+            // Memory
+            memoryChart.data.datasets[0].data = [data.memory.percent, 100 - data.memory.percent];
+            memoryChart.update();
+
+            document.getElementById('memoryUsed').textContent = data.memory.used + ' GB';
+            document.getElementById('memoryTotal').textContent = data.memory.total + ' GB';
+
+            // Disk
+            diskChart.data.datasets[0].data = [data.disk.percent, 100 - data.disk.percent];
+            diskChart.update();
+
+            document.getElementById('diskUsed').textContent = data.disk.used + ' GB';
+            document.getElementById('diskTotal').textContent = data.disk.total + ' GB';
+
+            // Network
+            if (networkData.length === 0) {
+                networkData.push({sent: data.network.sent, recv: data.network.recv});
+            } else {
+                networkData.push({
+                    sent: data.network.sent - networkData[networkData.length - 1].sent,
+                    recv: data.network.recv - networkData[networkData.length - 1].recv
+                });
+            }
+            if (networkData.length > maxDataPoints) networkData.shift();
+
+            networkChart.data.labels = Array.from({length: networkData.length}, (_, i) => i);
+            networkChart.data.datasets[0].data = networkData.map(d => d.sent);
+            networkChart.data.datasets[1].data = networkData.map(d => d.recv);
+            networkChart.update();
+
+            document.getElementById('netSent').textContent = data.network.sent + ' MB';
+            document.getElementById('netRecv').textContent = data.network.recv + ' MB';
+
+            // System info
+            document.getElementById('processCount').textContent = data.processes;
+        }
+
+        // Fetch system stats
+        async function fetchSystemStats() {
+            try {
+                const response = await fetch('/api/system_stats');
+                const data = await response.json();
+                updateCharts(data);
+            } catch (error) {
+                console.error('Error fetching system stats:', error);
+            }
+        }
+
+        // Reset charts
+        function resetCharts() {
+            cpuData.length = 0;
+            memoryData.length = 0;
+            diskData.length = 0;
+            networkData.length = 0;
+
+            cpuChart.data.labels = [];
+            cpuChart.data.datasets[0].data = [];
+            cpuChart.update();
+
+            memoryChart.data.datasets[0].data = [0, 100];
+            memoryChart.update();
+
+            diskChart.data.datasets[0].data = [0, 100];
+            diskChart.update();
+
+            networkChart.data.labels = [];
+            networkChart.data.datasets[0].data = [];
+            networkChart.data.datasets[1].data = [];
+            networkChart.update();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+
+            // Get system info once
+            fetch('/api/system_stats')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('pythonVersion').textContent = '3.x';
+                    document.getElementById('osVersion').textContent = navigator.platform;
+
+                    // Calculate uptime (simplified)
+                    const uptime = Math.floor(performance.now() / 1000 / 60 / 60);
+                    document.getElementById('uptime').textContent = uptime + ' horas';
+                });
+
+            // Update every 2 seconds
+            setInterval(fetchSystemStats, 2000);
+        });
+    </script>
+</body>
+</html>

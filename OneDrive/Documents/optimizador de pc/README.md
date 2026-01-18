@@ -35,6 +35,15 @@ python main.py
 ```
 Esto iniciará automáticamente la interfaz web y abrirá tu navegador en http://127.0.0.1:5000/
 
+## Dashboard de Monitoreo en Tiempo Real
+Accede al dashboard para ver estadísticas en tiempo real del sistema:
+- **CPU**: Uso porcentual y frecuencia
+- **Memoria RAM**: Uso y capacidad total
+- **Disco Duro**: Espacio usado y disponible
+- **Red**: Datos enviados y recibidos
+- **Procesos**: Número de procesos activos
+- **Información del sistema**: Uptime, versión del SO, etc.
+
 Si prefieres ejecutar solo la versión web sin auto-abrir navegador:
 ```
 python app.py
