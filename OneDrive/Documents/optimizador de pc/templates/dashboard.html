@@ -345,17 +345,357 @@
             // Análisis inteligente basado en estadísticas
             let response = '';
 
-            // Palabras clave para cada componente
-            const cpuKeywords = ['cpu', 'procesador', 'procesador central', 'microprocesador'];
-            const memoryKeywords = ['memoria', 'ram', 'memoria ram', 'memoria principal'];
-            const diskKeywords = ['disco', 'disco duro', 'almacenamiento', 'disco duro', 'ssd', 'hdd'];
-            const networkKeywords = ['red', 'internet', 'conexión', 'wifi', 'redes'];
-            const processKeywords = ['procesos', 'programas', 'aplicaciones', 'tareas'];
-            const optimizeKeywords = ['optimizar', 'mejorar', 'optimizar pc', 'mejorar rendimiento', 'acelerar'];
+            // Palabras clave para componentes del sistema
+            const cpuKeywords = ['cpu', 'procesador', 'procesador central', 'microprocesador', 'intel', 'amd', 'core'];
+            const memoryKeywords = ['memoria', 'ram', 'memoria ram', 'memoria principal', 'ddr', 'gb ram'];
+            const diskKeywords = ['disco', 'disco duro', 'almacenamiento', 'disco duro', 'ssd', 'hdd', 'disco sólido'];
+            const networkKeywords = ['red', 'internet', 'conexión', 'wifi', 'redes', 'ethernet', 'ip'];
+            const processKeywords = ['procesos', 'programas', 'aplicaciones', 'tareas', 'servicios'];
+            const optimizeKeywords = ['optimizar', 'mejorar', 'optimizar pc', 'mejorar rendimiento', 'acelerar', 'limpiar', 'limpieza'];
+
+            // Palabras clave generales para conversación
+            const greetingKeywords = ['hola', 'hi', 'hello', 'buenos', 'buenas', 'saludos', 'hey'];
+            const thanksKeywords = ['gracias', 'thank', 'merci', 'thanks'];
+            const helpKeywords = ['ayuda', 'qué puedes', 'hacer', 'comandos', 'funciones'];
+            const weatherKeywords = ['tiempo', 'clima', 'lluvia', 'sol', 'temperatura', 'weather'];
+            const timeKeywords = ['hora', 'tiempo', 'fecha', 'qué hora', 'qué día'];
+            const mathKeywords = ['cuanto es', 'calcula', 'suma', 'resta', 'multiplica', 'divide', 'calcular'];
+            const generalKeywords = ['qué es', 'cómo funciona', 'por qué', 'cuándo', 'dónde', 'quién'];
 
             const hasKeyword = (keywords) => keywords.some(keyword => q.includes(keyword));
 
-            if (hasKeyword(cpuKeywords)) {
+            // Sistema de conversación general
+            if (hasKeyword(greetingKeywords)) {
+                const hour = new Date().getHours();
+                let timeGreeting = 'buenos días';
+                if (hour >= 12 && hour < 18) timeGreeting = 'buenas tardes';
+                else if (hour >= 18) timeGreeting = 'buenas noches';
+
+                response = `👋 ¡${timeGreeting}! Soy **OptiBot**, tu asistente inteligente de optimización de PC.
+
+Estoy monitoreando tu sistema en tiempo real:
+• CPU: ${stats.cpu.percent.toFixed(1)}%
+• Memoria: ${stats.memory.percent.toFixed(1)}%
+• Disco: ${stats.disk.percent.toFixed(1)}%
+• Procesos: ${stats.processes}
+
+¿En qué puedo ayudarte hoy? Puedo responder preguntas sobre tu PC, optimización, o cualquier tema que te interese.`;
+            } else if (hasKeyword(thanksKeywords)) {
+                response = `🙂 ¡De nada! Estoy aquí para ayudarte. Si tienes más preguntas sobre optimización de PC, rendimiento del sistema, o cualquier otro tema, ¡no dudes en preguntarme!
+
+¿Hay algo más en lo que pueda asistirte?`;
+            } else if (hasKeyword(helpKeywords)) {
+                response = `🤖 **OPTI BOT - TU ASISTENTE INTELIGENTE**
+
+**Sobre tu PC:**
+• Análisis completo del rendimiento del sistema
+• Recomendaciones de optimización personalizadas
+• Diagnóstico de problemas de rendimiento
+• Monitoreo en tiempo real de CPU, memoria, disco y red
+
+**Conversación General:**
+• Respuestas a preguntas sobre tecnología, ciencia, matemáticas
+• Información general sobre diversos temas
+• Cálculos matemáticos básicos
+• Información del tiempo (general)
+• Conversación natural sobre cualquier tema
+
+**Ejemplos de preguntas:**
+• "¿Cómo está mi CPU?" → Análisis detallado
+• "¿Qué es una SSD?" → Explicación técnica
+• "¿Cuánto es 15 + 27?" → Cálculo matemático
+• "¿Por qué mi PC está lenta?" → Diagnóstico completo
+• "¿Qué es la inteligencia artificial?" → Explicación educativa
+
+**Comandos disponibles:**
+• Preguntas sobre optimización del sistema
+• Consultas técnicas y explicaciones
+• Cálculos y operaciones matemáticas
+• Información general y educativa
+
+¡Solo escribe tu pregunta y te ayudaré! 😊`;
+            } else if (hasKeyword(weatherKeywords)) {
+                response = `🌤️ **INFORMACIÓN DEL TIEMPO**
+
+Como soy un asistente local, no tengo acceso a datos meteorológicos en tiempo real, pero puedo darte consejos generales sobre el clima:
+
+**Consejos para el mantenimiento de PC según el clima:**
+• **Calor extremo:** Asegúrate de buena ventilación, limpia el polvo más frecuentemente
+• **Humedad alta:** Previene la condensación, usa deshumidificadores
+• **Frío:** Evita cambios bruscos de temperatura que puedan causar condensación
+
+**Para información del tiempo actual:**
+• Consulta apps meteorológicas como Weather App, AccuWeather
+• Revisa sitios web como meteored.com o eltiempo.es
+• Usa asistentes como Siri, Cortana o Google Assistant
+
+¿Te gustaría que te ayude con algún aspecto específico del cuidado de tu PC según el clima?`;
+            } else if (hasKeyword(timeKeywords)) {
+                const now = new Date();
+                const time = now.toLocaleTimeString('es-ES');
+                const date = now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                response = `🕐 **INFORMACIÓN DE TIEMPO Y FECHA**
+
+• **Hora actual:** ${time}
+• **Fecha:** ${date}
+• **Zona horaria:** ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+
+**Información adicional del sistema:**
+• Tu PC lleva funcionando aproximadamente ${Math.floor(performance.now() / 1000 / 60 / 60)} horas desde que abriste el navegador
+• Procesos activos: ${stats.processes}
+
+¿Necesitas ayuda con algo relacionado con el tiempo o el rendimiento de tu sistema?`;
+            } else if (hasKeyword(mathKeywords)) {
+                // Intentar resolver operaciones matemáticas simples
+                try {
+                    // Extraer números y operaciones
+                    const numbers = q.match(/\d+/g);
+                    const operations = q.match(/[+\-*/]/g);
+
+                    if (numbers && numbers.length >= 2) {
+                        const num1 = parseFloat(numbers[0]);
+                        const num2 = parseFloat(numbers[1]);
+
+                        if (q.includes('suma') || q.includes('+')) {
+                            response = `🧮 **CÁLCULO MATEMÁTICO**
+${num1} + ${num2} = **${num1 + num2}**
+
+Si necesitas cálculos más complejos, puedo ayudarte con sumas, restas, multiplicaciones y divisiones básicas.`;
+                        } else if (q.includes('resta') || q.includes('-')) {
+                            response = `🧮 **CÁLCULO MATEMÁTICO**
+${num1} - ${num2} = **${num1 - num2}**
+
+Si necesitas cálculos más complejos, puedo ayudarte con sumas, restas, multiplicaciones y divisiones básicas.`;
+                        } else if (q.includes('multiplica') || q.includes('*')) {
+                            response = `🧮 **CÁLCULO MATEMÁTICO**
+${num1} × ${num2} = **${num1 * num2}**
+
+Si necesitas cálculos más complejos, puedo ayudarte con sumas, restas, multiplicaciones y divisiones básicas.`;
+                        } else if (q.includes('divide') || q.includes('/')) {
+                            if (num2 !== 0) {
+                                response = `🧮 **CÁLCULO MATEMÁTICO**
+${num1} ÷ ${num2} = **${(num1 / num2).toFixed(2)}**
+
+Si necesitas cálculos más complejos, puedo ayudarte con sumas, restas, multiplicaciones y divisiones básicas.`;
+                            } else {
+                                response = `🧮 **ERROR MATEMÁTICO**
+No se puede dividir por cero. ¡El resultado sería infinito!
+
+¿Te gustaría hacer otro cálculo matemático?`;
+                            }
+                        } else {
+                            response = `🧮 **CÁLCULO MATEMÁTICO**
+Detecté los números ${numbers.join(', ')} en tu pregunta.
+
+Para realizar cálculos, puedes preguntarme:
+• "¿Cuánto es 15 + 27?"
+• "¿Puedes calcular 100 - 25?"
+• "¿Cuánto es 8 × 7?"
+• "¿Divide 144 entre 12?"
+
+¡Prueba con una operación específica!`;
+                        }
+                    } else {
+                        response = `🧮 **CALCULADORA INTEGRADA**
+
+Puedo ayudarte con cálculos matemáticos básicos. Solo pregúntame:
+
+**Ejemplos:**
+• "¿Cuánto es 15 + 27?"
+• "¿Puedes calcular 100 - 25?"
+• "¿Cuánto es 8 × 7?"
+• "¿Divide 144 entre 12?"
+
+**Operaciones disponibles:**
+• Suma (+)
+• Resta (-)
+• Multiplicación (×)
+• División (÷)
+
+¿Te gustaría hacer algún cálculo?`;
+                    }
+                } catch (error) {
+                    response = `🧮 Lo siento, no pude procesar ese cálculo. Intenta preguntarme de forma más simple, por ejemplo: "¿Cuánto es 15 + 27?"`;
+                }
+            } else if (hasKeyword(generalKeywords) || q.includes('qué') || q.includes('cómo') || q.includes('por qué') || q.includes('cuándo')) {
+                // Respuestas a preguntas generales
+                if (q.includes('qué es') && (q.includes('cpu') || q.includes('procesador'))) {
+                    response = `🖥️ **¿Qué es la CPU?**
+
+La **CPU (Central Processing Unit)** es el "cerebro" de tu computadora. Es el componente principal que ejecuta todas las instrucciones de los programas.
+
+**Características importantes:**
+• **Núcleos:** ${stats.cpu.count} núcleos (permite multitasking)
+• **Frecuencia:** ${stats.cpu.freq_current.toFixed(0)} MHz (velocidad de procesamiento)
+• **Uso actual:** ${stats.cpu.percent.toFixed(1)}%
+
+**Función:** Procesa datos, ejecuta programas, coordina todas las operaciones del sistema.
+
+¿Te gustaría saber más sobre algún aspecto específico de la CPU?`;
+                } else if (q.includes('qué es') && q.includes('memoria ram')) {
+                    response = `💾 **¿Qué es la Memoria RAM?**
+
+La **RAM (Random Access Memory)** es la memoria temporal de tu PC. Almacena datos que el sistema necesita acceder rápidamente.
+
+**Tu sistema:**
+• **Total:** ${stats.memory.total.toFixed(1)} GB
+• **En uso:** ${stats.memory.used.toFixed(1)} GB (${stats.memory.percent.toFixed(1)}%)
+• **Disponible:** ${(stats.memory.total - stats.memory.used).toFixed(1)} GB
+
+**Función:** Almacena programas en ejecución, datos temporales, mejora la velocidad de respuesta.
+
+**Tip:** Si tu RAM está frecuentemente por encima del 80%, considera agregar más memoria.`;
+                } else if (q.includes('qué es') && (q.includes('disco') || q.includes('ssd') || q.includes('hdd'))) {
+                    response = `💿 **¿Qué es un Disco Duro/SSD?**
+
+El **disco duro** es el dispositivo de almacenamiento permanente de tu PC. Guarda todos tus archivos, programas y sistema operativo.
+
+**Tu sistema:**
+• **Capacidad total:** ${stats.disk.total.toFixed(1)} GB
+• **En uso:** ${stats.disk.used.toFixed(1)} GB (${stats.disk.percent.toFixed(1)}%)
+• **Disponible:** ${(stats.disk.total - stats.disk.used).toFixed(1)} GB
+
+**Tipos:**
+• **HDD:** Mecánico, más lento pero más barato
+• **SSD:** Electrónico, mucho más rápido y confiable
+
+**Recomendación:** Mantén al menos 20% de espacio libre para buen rendimiento.`;
+                } else if (q.includes('qué es') && q.includes('inteligencia artificial')) {
+                    response = `🤖 **¿Qué es la Inteligencia Artificial?**
+
+La **Inteligencia Artificial (IA)** es la simulación de procesos de inteligencia humana en máquinas programadas para pensar y aprender como los humanos.
+
+**Yo soy un ejemplo de IA:**
+• Analizo datos en tiempo real
+• Aprendo de patrones del sistema
+• Doy recomendaciones inteligentes
+• Respondo preguntas conversacionalmente
+
+**Aplicaciones de la IA:**
+• Asistentes virtuales (como yo)
+• Reconocimiento de imágenes
+• Procesamiento de lenguaje natural
+• Análisis predictivo
+• Automatización inteligente
+
+**Tipos de IA:**
+• **IA Débil/Estrecha:** Excelente en tareas específicas (como yo para optimización)
+• **IA General:** Capaz de realizar cualquier tarea intelectual humana
+• **IA Súper Inteligente:** Hipotética, más inteligente que los humanos
+
+¿Te gustaría saber más sobre algún aspecto específico de la IA?`;
+                } else if (q.includes('cómo funciona') && q.includes('computadora')) {
+                    response = `🖥️ **¿Cómo funciona una computadora?**
+
+Una computadora es un sistema complejo que procesa información a través de varios componentes que trabajan juntos:
+
+**1. Hardware (Componentes físicos):**
+• **CPU:** Cerebro que procesa instrucciones
+• **RAM:** Memoria temporal para datos activos
+• **Disco Duro:** Almacenamiento permanente
+• **Tarjeta Gráfica:** Procesamiento visual
+• **Placa Madre:** Conecta todos los componentes
+
+**2. Software (Programas):**
+• **Sistema Operativo:** Windows, macOS, Linux
+• **Aplicaciones:** Programas que usas diariamente
+• **Controladores:** Permiten comunicación hardware-software
+
+**3. Proceso básico:**
+1. Usuario da instrucciones (click, teclado)
+2. Sistema operativo recibe la instrucción
+3. CPU procesa los datos
+4. RAM almacena datos temporales
+5. Disco guarda información permanente
+6. Pantalla muestra los resultados
+
+**Tu PC actualmente:**
+• Procesando ${stats.processes} programas simultáneamente
+• Usando ${stats.cpu.percent.toFixed(1)}% de capacidad de CPU
+• Gestionando ${stats.memory.used.toFixed(1)} GB de datos en RAM
+
+¿Te gustaría que explique algún componente específico?`;
+                } else if (q.includes('por qué') && (q.includes('pc') || q.includes('computadora')) && q.includes('lenta')) {
+                    response = `🐌 **¿Por qué mi PC está lenta?**
+
+Basándome en el análisis de tu sistema, aquí están las posibles causas y soluciones:
+
+**Estado actual de tu PC:**
+• CPU: ${stats.cpu.percent.toFixed(1)}% ${stats.cpu.percent > 80 ? '🔴 MUY ALTO' : stats.cpu.percent > 60 ? '🟡 ALTO' : '🟢 NORMAL'}
+• Memoria: ${stats.memory.percent.toFixed(1)}% ${stats.memory.percent > 85 ? '🔴 CRÍTICA' : stats.memory.percent > 70 ? '🟡 ALTA' : '🟢 BUENA'}
+• Disco: ${stats.disk.percent.toFixed(1)}% ${stats.disk.percent > 90 ? '🔴 CASI LLENO' : stats.disk.percent > 75 ? '🟡 LLENO' : '🟢 BUEN ESPACIO'}
+• Procesos: ${stats.processes} ${stats.processes > 150 ? '🔴 DEMASIADOS' : stats.processes > 100 ? '🟡 MODERADOS' : '🟢 ÓPTIMO'}
+
+**Causas más comunes de lentitud:**
+
+1. **Recursos insuficientes:**
+   • CPU sobrecargada por múltiples programas
+   • Memoria RAM llena
+   • Disco duro casi sin espacio
+
+2. **Problemas de software:**
+   • Muchos programas iniciándose con Windows
+   • Malware o virus
+   • Controladores desactualizados
+   • Registro de Windows fragmentado
+
+3. **Problemas de hardware:**
+   • Disco duro dañado o fragmentado
+   • Ventiladores sucios (sobrecalentamiento)
+   • Memoria RAM defectuosa
+
+4. **Problemas de configuración:**
+   • Animaciones y efectos visuales activados
+   • Servicios innecesarios ejecutándose
+   • Configuración de energía inadecuada
+
+**Soluciones inmediatas:**
+1. Cierra programas que no uses
+2. Ejecuta optimizaciones completas
+3. Limpia archivos temporales
+4. Reinicia el sistema
+
+¿Te gustaría que ejecute alguna optimización específica para mejorar el rendimiento?`;
+                } else {
+                    // Respuesta general para preguntas que no entiende específicamente
+                    response = `🤔 **Pregunta interesante: "${question}"**
+
+Como asistente inteligente, puedo ayudarte con información sobre:
+
+**💻 Tu PC y optimización:**
+• Análisis de rendimiento del sistema
+• Recomendaciones de optimización
+• Diagnóstico de problemas
+• Consejos de mantenimiento
+
+**🧮 Cálculos matemáticos:**
+• Sumas, restas, multiplicaciones, divisiones
+• Cálculos básicos
+
+**📚 Conocimiento general:**
+• Tecnología y computación
+• Ciencia y explicaciones
+• Consejos prácticos
+
+**🌐 Información general:**
+• Tiempo (consejos)
+• Fechas y horas
+• Conversación natural
+
+**Para responder mejor tu pregunta, podrías:**
+• Darme más detalles específicos
+• Preguntarme sobre aspectos relacionados con tu PC
+• Hacer una pregunta más concreta
+
+¿Te gustaría reformular tu pregunta o prefieres que te ayude con algo relacionado con la optimización de tu PC?
+
+**Estado actual de tu sistema:**
+• CPU: ${stats.cpu.percent.toFixed(1)}%
+• Memoria: ${stats.memory.percent.toFixed(1)}%
+• Disco: ${stats.disk.percent.toFixed(1)}%`;
+                }
+            } else if (hasKeyword(cpuKeywords)) {
                 const usage = stats.cpu.percent;
                 if (usage > 90) {
                     response = `🚨 ¡ALERTA CRÍTICA! Tu CPU está al ${usage.toFixed(1)}%, lo cual es extremadamente alto. Esto puede causar inestabilidad. Te recomiendo:\n• Cerrar inmediatamente programas innecesarios\n• Ejecutar optimización de procesos\n• Revisar si hay malware\n• Considerar reiniciar el sistema`;
