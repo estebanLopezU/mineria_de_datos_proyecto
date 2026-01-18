@@ -3,66 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimizador de PC</title>
+    <title>Optimizador Avanzado de PC</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Optimizador Avanzado de PC</h1>
-        <p>Selecciona las optimizaciones que deseas realizar:</p>
-        <div style="text-align: center; margin-bottom: 20px;">
-            <a href="/dashboard" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 10px;">📊 Ver Dashboard en Tiempo Real</a>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Optimizador PC
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="bi bi-house-door me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-graph-up me-1"></i>Dashboard
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">
+                            <i class="bi bi-star me-1"></i>Características
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <div class="disk-visualization">
-            <div class="disk-3d">
-                <div class="disk-cylinder"></div>
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="bi bi-rocket-takeoff text-warning me-3"></i>
+                        Optimizador Avanzado de PC
+                    </h1>
+                    <p class="lead mb-4">
+                        Mejora el rendimiento de tu computadora con herramientas profesionales de optimización.
+                        Monitoreo en tiempo real, limpieza inteligente y análisis detallado del sistema.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="#optimization" class="btn btn-light btn-lg">
+                            <i class="bi bi-play-circle me-2"></i>Comenzar Optimización
+                        </a>
+                        <a href="/dashboard" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-graph-up me-2"></i>Ver Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-visualization">
+                        <div class="disk-3d-large">
+                            <div class="disk-cylinder-large"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h4 class="text-white-50">Sistema Optimizado</h4>
+                            <div class="progress mt-3" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 85%"></div>
+                            </div>
+                            <small class="text-white-50 mt-2 d-block">Rendimiento: Excelente</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="disk-label">Disco Duro Virtual</div>
         </div>
-        <form action="/optimize" method="post">
-            <h3>Optimizaciones Básicas</h3>
-            <div class="option">
-                <input type="checkbox" id="info_sistema" name="info_sistema" checked>
-                <label for="info_sistema">Obtener información del sistema</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="limpiar_temp" name="limpiar_temp" checked>
-                <label for="limpiar_temp">Limpiar archivos temporales</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="vaciar_papelera" name="vaciar_papelera" checked>
-                <label for="vaciar_papelera">Vaciar papelera de reciclaje</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="listar_inicio" name="listar_inicio" checked>
-                <label for="listar_inicio">Listar programas de inicio</label>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-5 fw-bold text-primary mb-3">Características Avanzadas</h2>
+                    <p class="lead text-muted">Herramientas profesionales para optimizar y monitorear tu PC</p>
+                </div>
             </div>
 
-            <h3>Optimizaciones Avanzadas</h3>
-            <div class="option">
-                <input type="checkbox" id="desfragmentar" name="desfragmentar">
-                <label for="desfragmentar">Desfragmentar disco duro</label>
+            <div class="row g-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-cpu text-primary fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Monitoreo en Tiempo Real</h5>
+                            <p class="card-text text-muted">
+                                Supervisa CPU, memoria, disco y procesos con gráficos interactivos y actualizaciones automáticas cada 2 segundos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-robot text-success fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Asistente IA OptiBot</h5>
+                            <p class="card-text text-muted">
+                                Chat inteligente que responde preguntas sobre optimización, realiza cálculos matemáticos y brinda recomendaciones personalizadas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-tools text-warning fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Optimizaciones Avanzadas</h5>
+                            <p class="card-text text-muted">
+                                Limpieza profunda, desfragmentación, optimización de registro y eliminación de archivos innecesarios de forma segura.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="option">
-                <input type="checkbox" id="limpiar_prefetch" name="limpiar_prefetch">
-                <label for="limpiar_prefetch">Limpiar archivos prefetch</label>
+        </div>
+    </section>
+
+    <!-- Optimization Form -->
+    <section id="optimization" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white text-center py-4">
+                            <h3 class="mb-0">
+                                <i class="bi bi-gear-wide-connected me-2"></i>
+                                Ejecutar Optimización
+                            </h3>
+                            <p class="mb-0 mt-2 opacity-75">Selecciona las optimizaciones que deseas realizar</p>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <form action="/optimize" method="post">
+                                <!-- Basic Optimizations -->
+                                <div class="mb-4">
+                                    <h5 class="fw-bold text-primary mb-3">
+                                        <i class="bi bi-star me-2"></i>Optimizaciones Básicas
+                                    </h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="info_sistema" name="info_sistema" checked>
+                                                <label class="form-check-label fw-semibold" for="info_sistema">
+                                                    <i class="bi bi-info-circle text-info me-2"></i>
+                                                    Información del Sistema
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Análisis completo de hardware y software</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="limpiar_temp" name="limpiar_temp" checked>
+                                                <label class="form-check-label fw-semibold" for="limpiar_temp">
+                                                    <i class="bi bi-trash text-danger me-2"></i>
+                                                    Limpiar Archivos Temporales
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Eliminar archivos innecesarios del sistema</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="vaciar_papelera" name="vaciar_papelera" checked>
+                                                <label class="form-check-label fw-semibold" for="vaciar_papelera">
+                                                    <i class="bi bi-recycle text-success me-2"></i>
+                                                    Vaciar Papelera
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Eliminar archivos de la papelera de reciclaje</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="listar_inicio" name="listar_inicio" checked>
+                                                <label class="form-check-label fw-semibold" for="listar_inicio">
+                                                    <i class="bi bi-list-check text-primary me-2"></i>
+                                                    Analizar Inicio
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Revisar programas que inician con Windows</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Optimizations -->
+                                <div class="mb-4">
+                                    <h5 class="fw-bold text-warning mb-3">
+                                        <i class="bi bi-lightning me-2"></i>Optimizaciones Avanzadas
+                                    </h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="desfragmentar" name="desfragmentar">
+                                                <label class="form-check-label fw-semibold" for="desfragmentar">
+                                                    <i class="bi bi-diagram-3 text-secondary me-2"></i>
+                                                    Desfragmentar Disco
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Optimizar el rendimiento del disco duro</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="limpiar_prefetch" name="limpiar_prefetch">
+                                                <label class="form-check-label fw-semibold" for="limpiar_prefetch">
+                                                    <i class="bi bi-file-earmark-zip text-info me-2"></i>
+                                                    Limpiar Prefetch
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Eliminar archivos de prefetch del sistema</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="limpiar_cache_nav" name="limpiar_cache_nav">
+                                                <label class="form-check-label fw-semibold" for="limpiar_cache_nav">
+                                                    <i class="bi bi-browser-chrome text-success me-2"></i>
+                                                    Limpiar Cache Navegadores
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Eliminar cache de Chrome y Firefox</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="limpiar_windows_update" name="limpiar_windows_update">
+                                                <label class="form-check-label fw-semibold" for="limpiar_windows_update">
+                                                    <i class="bi bi-windows text-primary me-2"></i>
+                                                    Limpiar Windows Update
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Eliminar archivos temporales de actualizaciones</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check optimization-option p-3 rounded">
+                                                <input class="form-check-input" type="checkbox" id="espacio_liberado" name="espacio_liberado">
+                                                <label class="form-check-label fw-semibold" for="espacio_liberado">
+                                                    <i class="bi bi-calculator text-warning me-2"></i>
+                                                    Calcular Espacio Liberado
+                                                </label>
+                                                <small class="text-muted d-block mt-1">Estimar el espacio recuperado</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 me-3">
+                                        <i class="bi bi-play-circle me-2"></i>Ejecutar Optimización
+                                    </button>
+                                    <button type="button" onclick="selectAll()" class="btn btn-outline-secondary me-3">
+                                        <i class="bi bi-check-all me-1"></i>Seleccionar Todo
+                                    </button>
+                                    <button type="button" onclick="clearSelection()" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>Limpiar Selección
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="option">
-                <input type="checkbox" id="limpiar_cache_nav" name="limpiar_cache_nav">
-                <label for="limpiar_cache_nav">Limpiar cache de navegadores</label>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Optimizador de PC</h5>
+                    <p class="mb-0">Herramientas profesionales para optimizar y monitorear el rendimiento de tu computadora.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><strong>Desarrollado por:</strong> Esteban López</p>
+                    <p class="mb-0"><small>Versión 2.0 - Dashboard Profesional</small></p>
+                </div>
             </div>
-            <div class="option">
-                <input type="checkbox" id="limpiar_windows_update" name="limpiar_windows_update">
-                <label for="limpiar_windows_update">Limpiar archivos de Windows Update</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="espacio_liberado" name="espacio_liberado">
-                <label for="espacio_liberado">Calcular espacio liberado</label>
-            </div>
-            <button type="submit">Ejecutar Optimización</button>
-        </form>
-    </div>
+        </div>
+    </footer>
+
+    <script>
+        // Select all optimizations
+        function selectAll() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+        }
+
+        // Clear all selections
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+        }
+
+        // Add hover effects to optimization options
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = document.querySelectorAll('.optimization-option');
+            options.forEach(option => {
+                option.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                });
+
+                option.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
