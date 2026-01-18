@@ -81,19 +81,46 @@
 
         <!-- AI Assistant Section -->
         <div class="ai-assistant">
-            <h3>🤖 Asistente IA - OptiBot</h3>
+            <h3>🤖 Chat con OptiBot - Tu Asistente IA</h3>
             <div class="ai-chat-container">
-                <div class="ai-recommendations" id="aiRecommendations">
-                    <div class="ai-message ai-bot">
+                <div class="ai-chat-messages" id="aiChatMessages">
+                    <div class="ai-message ai-bot welcome-message">
                         <div class="ai-avatar">🤖</div>
                         <div class="ai-content">
-                            <strong>OptiBot:</strong> Analizando tu sistema... Espera las recomendaciones inteligentes.
+                            <strong>OptiBot:</strong> ¡Hola! Soy tu asistente inteligente de optimización. Estoy monitoreando tu PC en tiempo real.<br><br>
+                            <strong>Estado actual:</strong><br>
+                            • CPU: <span id="welcomeCpu">--</span>%<br>
+                            • Memoria: <span id="welcomeMemory">--</span>%<br>
+                            • Disco: <span id="welcomeDisk">--</span>%<br><br>
+                            ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre optimización, rendimiento, o cualquier tema. ¡Solo escribe tu mensaje!
                         </div>
                     </div>
                 </div>
-                <div class="ai-chat-input">
-                    <input type="text" id="aiQuestion" placeholder="Pregúntame sobre tu PC o el rendimiento..." />
-                    <button onclick="askAI()">Preguntar</button>
+                <div class="ai-chat-input-container">
+                    <div class="ai-emoji-bar">
+                        <button onclick="addEmoji('😊')" title="Feliz">😊</button>
+                        <button onclick="addEmoji('👍')" title="Me gusta">👍</button>
+                        <button onclick="addEmoji('❤️')" title="Corazón">❤️</button>
+                        <button onclick="addEmoji('😂')" title="Risa">😂</button>
+                        <button onclick="addEmoji('😮')" title="Sorprendido">😮</button>
+                        <button onclick="addEmoji('🙏')" title="Gracias">🙏</button>
+                        <button onclick="addEmoji('🔧')" title="Herramientas">🔧</button>
+                        <button onclick="addEmoji('💻')" title="Computadora">💻</button>
+                    </div>
+                    <div class="ai-chat-input">
+                        <input type="text" id="aiMessage" placeholder="Escribe tu mensaje aquí..." />
+                        <button onclick="sendMessage()" id="sendButton">
+                            <span id="sendIcon">📤</span>
+                        </button>
+                    </div>
+                    <div class="ai-chat-status">
+                        <span id="typingIndicator" style="display: none;">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            OptiBot está escribiendo...
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -773,16 +800,22 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             return response;
         }
 
-        // Add AI message to chat
-        function addAIMessage(message, isUser = false) {
-            const chatContainer = document.getElementById('aiRecommendations');
+        // Add message to chat
+        function addMessage(message, isUser = false) {
+            const chatContainer = document.getElementById('aiChatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `ai-message ${isUser ? 'ai-user' : 'ai-bot'}`;
+
+            const timestamp = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
             messageDiv.innerHTML = `
                 <div class="ai-avatar">${isUser ? '👤' : '🤖'}</div>
                 <div class="ai-content">
-                    <strong>${isUser ? 'Tú' : 'OptiBot'}:</strong> ${message}
+                    <div class="ai-message-header">
+                        <strong>${isUser ? 'Tú' : 'OptiBot'}</strong>
+                        <span class="ai-timestamp">${timestamp}</span>
+                    </div>
+                    <div class="ai-message-text">${message.replace(/\n/g, '<br>')}</div>
                 </div>
             `;
 
@@ -790,69 +823,176 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             chatContainer.scrollTop = chatContainer.scrollHeight;
             aiMessageCount++;
 
-            // Limit messages to prevent overflow
-            if (aiMessageCount > 10) {
-                chatContainer.removeChild(chatContainer.firstChild);
-                aiMessageCount--;
+            // Limit messages to prevent overflow (keep last 15 messages)
+            if (aiMessageCount > 15) {
+                const firstMessage = chatContainer.querySelector('.ai-message');
+                if (firstMessage && !firstMessage.classList.contains('welcome-message')) {
+                    chatContainer.removeChild(firstMessage);
+                    aiMessageCount--;
+                }
             }
         }
 
-        // Generate AI recommendations based on stats
-        function generateAIRecommendations(stats) {
-            let recommendations = [];
-
-            if (stats.cpu.percent > 80) {
-                recommendations.push("🔥 CPU muy alta: Cierra programas innecesarios");
-            }
-
-            if (stats.memory.percent > 85) {
-                recommendations.push("💾 Memoria baja: Libera RAM cerrando aplicaciones");
-            }
-
-            if (stats.disk.percent > 90) {
-                recommendations.push("💿 Disco casi lleno: Ejecuta limpieza urgente");
-            }
-
-            if (stats.processes > 150) {
-                recommendations.push("⚙️ Muchos procesos: Revisa el administrador de tareas");
-            }
-
-            if (recommendations.length === 0) {
-                recommendations.push("✅ Tu sistema está funcionando bien");
-                recommendations.push("💡 Recomiendo ejecutar optimizaciones preventivas semanalmente");
-            }
-
-            return recommendations;
+        // Show typing indicator
+        function showTyping() {
+            const statusDiv = document.getElementById('typingIndicator');
+            statusDiv.style.display = 'block';
         }
 
-        // Ask AI function
-        function askAI() {
-            const input = document.getElementById('aiQuestion');
-            const question = input.value.trim();
+        // Hide typing indicator
+        function hideTyping() {
+            const statusDiv = document.getElementById('typingIndicator');
+            statusDiv.style.display = 'none';
+        }
 
-            if (!question) return;
+        // Send message function
+        function sendMessage() {
+            const input = document.getElementById('aiMessage');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Disable input while processing
+            input.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+            document.getElementById('sendIcon').textContent = '⏳';
 
             // Add user message
-            addAIMessage(question, true);
+            addMessage(message, true);
 
-            // Generate AI response
-            const response = generateAIResponse(question, currentStats);
-
-            // Add AI response with slight delay for natural feel
-            setTimeout(() => {
-                addAIMessage(response);
-            }, 500);
+            // Show typing indicator
+            showTyping();
 
             // Clear input
             input.value = '';
+
+            // Generate AI response with delay
+            setTimeout(() => {
+                const response = generateAIResponse(message, currentStats);
+
+                // Hide typing and show response
+                hideTyping();
+                addMessage(response);
+
+                // Re-enable input
+                input.disabled = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('sendIcon').textContent = '📤';
+
+                // Focus input
+                input.focus();
+            }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds for natural feel
         }
 
         // Allow Enter key to send message
-        document.getElementById('aiQuestion').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                askAI();
+        document.getElementById('aiMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
         });
+
+        // Update welcome message with current stats
+        function updateWelcomeMessage(stats) {
+            const welcomeCpu = document.getElementById('welcomeCpu');
+            const welcomeMemory = document.getElementById('welcomeMemory');
+            const welcomeDisk = document.getElementById('welcomeDisk');
+
+            if (welcomeCpu && stats) {
+                welcomeCpu.textContent = stats.cpu.percent.toFixed(1) + '%';
+                welcomeMemory.textContent = stats.memory.percent.toFixed(1) + '%';
+                welcomeDisk.textContent = stats.disk.percent.toFixed(1) + '%';
+            }
+        }
+
+        // Add emoji to input
+        function addEmoji(emoji) {
+            const input = document.getElementById('aiMessage');
+            input.value += emoji;
+            input.focus();
+        }
+
+        // Drag functionality
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let initialX = 0;
+        let initialY = 0;
+
+        function initDrag() {
+            const aiAssistant = document.querySelector('.ai-assistant');
+
+            aiAssistant.addEventListener('mousedown', startDrag);
+            aiAssistant.addEventListener('touchstart', startDrag, { passive: false });
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            const aiAssistant = document.querySelector('.ai-assistant');
+
+            // Only start drag if clicking on the drag handle or the header area
+            if (e.target.closest('.drag-handle') || e.target.tagName === 'H3') {
+                isDragging = true;
+                aiAssistant.classList.add('dragging');
+
+                const rect = aiAssistant.getBoundingClientRect();
+                initialX = rect.left;
+                initialY = rect.top;
+
+                if (e.type === 'touchstart') {
+                    dragStartX = e.touches[0].clientX;
+                    dragStartY = e.touches[0].clientY;
+                } else {
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                }
+
+                e.preventDefault();
+            }
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            e.preventDefault();
+
+            let currentX, currentY;
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+
+            const deltaX = currentX - dragStartX;
+            const deltaY = currentY - dragStartY;
+
+            const aiAssistant = document.querySelector('.ai-assistant');
+            const newX = initialX + deltaX;
+            const newY = initialY + deltaY;
+
+            // Keep within viewport bounds
+            const maxX = window.innerWidth - aiAssistant.offsetWidth;
+            const maxY = window.innerHeight - aiAssistant.offsetHeight;
+
+            aiAssistant.style.left = Math.max(0, Math.min(newX, maxX)) + 'px';
+            aiAssistant.style.top = Math.max(0, Math.min(newY, maxY)) + 'px';
+            aiAssistant.style.position = 'fixed';
+        }
+
+        function endDrag() {
+            if (isDragging) {
+                isDragging = false;
+                const aiAssistant = document.querySelector('.ai-assistant');
+                aiAssistant.classList.remove('dragging');
+            }
+        }
 
         // Update charts with new data
         function updateCharts(data) {
@@ -905,17 +1045,14 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             // System info
             document.getElementById('processCount').textContent = data.processes;
 
-            // Update AI recommendations every few updates
-            if (aiMessageCount === 1) { // Only initial message
-                const recommendations = generateAIRecommendations(data);
-                const recMessage = "💡 **Recomendaciones inteligentes:**<br>" + recommendations.join('<br>');
-                document.querySelector('.ai-content').innerHTML = `<strong>OptiBot:</strong> ${recMessage}`;
-            }
+            // Update welcome message stats
+            updateWelcomeMessage(data);
         }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             initCharts();
+            initDrag(); // Initialize drag functionality
 
             // Get system info once
             fetch('/api/system_stats')
@@ -934,4 +1071,4 @@ Como asistente inteligente, puedo ayudarte con información sobre:
         });
     </script>
 </body>
-</html>
+</html>        });
