@@ -95,7 +95,6 @@ def limpiar_cache_navegadores():
     chrome_cache = os.path.expanduser("~\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache")
     if os.path.exists(chrome_cache):
         try:
-            import shutil
             shutil.rmtree(chrome_cache)
             resultados["chrome"] = "Cache de Chrome limpiado."
         except Exception as e:
