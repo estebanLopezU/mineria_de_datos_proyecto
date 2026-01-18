@@ -44,15 +44,42 @@ Accede al dashboard para ver estadísticas en tiempo real del sistema:
 - **Procesos**: Número de procesos activos
 - **Información del sistema**: Uptime, versión del SO, etc.
 
-## 🤖 Asistente IA OptiBot
-El dashboard incluye un asistente inteligente que:
-- **Analiza automáticamente** el rendimiento de tu sistema
-- **Genera recomendaciones** personalizadas basadas en estadísticas
-- **Responde preguntas** sobre optimización y componentes de PC
-- **Explica estadísticas** en tiempo real
-- **Proporciona consejos** preventivos de mantenimiento
+## 🤖 Asistente IA OptiBot - Tu ChatGPT Personal
+El dashboard incluye un asistente inteligente conversacional que:
 
-Pregúntale sobre CPU, memoria, disco, red, procesos, o cualquier aspecto de tu PC.
+### **Sobre tu PC:**
+- **Análisis automático** del rendimiento del sistema en tiempo real
+- **Recomendaciones personalizadas** basadas en estadísticas actuales
+- **Diagnóstico inteligente** de problemas de rendimiento
+- **Explicaciones detalladas** de componentes y funcionamiento
+- **Planes de optimización** adaptados a tu situación
+
+### **Conversación General:**
+- **Cálculos matemáticos** (sumas, restas, multiplicaciones, divisiones)
+- **Información técnica** sobre computación y tecnología
+- **Explicaciones educativas** sobre conceptos complejos
+- **Consejos prácticos** sobre diversos temas
+- **Información general** (hora, fecha, consejos sobre clima)
+
+### **Ejemplos de Preguntas:**
+**Sobre optimización:**
+• "¿Cómo está mi CPU?"
+• "¿Qué optimizaciones recomiendas?"
+• "¿Por qué mi PC está lenta?"
+• "¿Cuánta memoria estoy usando?"
+
+**Conversación general:**
+• "¿Cuánto es 15 + 27?" (cálculos matemáticos)
+• "¿Qué es la inteligencia artificial?" (explicaciones técnicas)
+• "¿Qué hora es?" (información general)
+• "¿Cómo funciona una computadora?" (explicaciones educativas)
+
+**Preguntas abiertas:**
+• "Hola" → Saludo personalizado con estado del sistema
+• "¿Qué puedes hacer?" → Lista completa de capacidades
+• "Gracias" → Respuesta amable y oferta de más ayuda
+
+OptiBot combina el conocimiento especializado en optimización de PC con la capacidad de mantener conversaciones naturales sobre cualquier tema, ¡como un ChatGPT especializado en tu sistema!
 
 Si prefieres ejecutar solo la versión web sin auto-abrir navegador:
 ```
