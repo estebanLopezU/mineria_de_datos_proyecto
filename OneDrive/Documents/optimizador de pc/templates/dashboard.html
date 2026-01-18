@@ -1272,29 +1272,48 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             currentStats = data; // Store for AI use
             const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
 
-            // CPU
+            // CPU - Update both card and detailed views
             cpuData.push(data.cpu.percent);
             if (cpuData.length > maxDataPoints) cpuData.shift();
             cpuChart.data.labels = Array.from({length: cpuData.length}, (_, i) => i);
             cpuChart.data.datasets[0].data = cpuData;
             cpuChart.update();
 
-            document.getElementById('cpuPercent').textContent = data.cpu.percent.toFixed(1) + '%';
-            document.getElementById('cpuFreq').textContent = (data.cpu.freq_current / 1000).toFixed(2) + ' GHz';
+            // Update CPU card
+            const cpuPercentCard = document.getElementById('cpuPercentCard');
+            const cpuFreqCard = document.getElementById('cpuFreqCard');
+            if (cpuPercentCard) cpuPercentCard.textContent = data.cpu.percent.toFixed(1) + '%';
+            if (cpuFreqCard) cpuFreqCard.textContent = (data.cpu.freq_current / 1000).toFixed(2) + ' GHz';
+
+            // Update CPU average and max
+            const cpuAvg = cpuData.reduce((a, b) => a + b, 0) / cpuData.length;
+            const cpuMax = Math.max(...cpuData);
+            document.getElementById('cpuAvg').textContent = cpuAvg.toFixed(1) + '%';
+            document.getElementById('cpuMax').textContent = cpuMax.toFixed(1) + '%';
 
             // Memory
             memoryChart.data.datasets[0].data = [data.memory.percent, 100 - data.memory.percent];
             memoryChart.update();
 
-            document.getElementById('memoryUsed').textContent = data.memory.used + ' GB';
-            document.getElementById('memoryTotal').textContent = data.memory.total + ' GB';
+            // Update memory card
+            const memoryPercentCard = document.getElementById('memoryPercentCard');
+            const memoryUsedCard = document.getElementById('memoryUsedCard');
+            const memoryTotalCard = document.getElementById('memoryTotalCard');
+            if (memoryPercentCard) memoryPercentCard.textContent = data.memory.percent.toFixed(1) + '%';
+            if (memoryUsedCard) memoryUsedCard.textContent = data.memory.used.toFixed(1);
+            if (memoryTotalCard) memoryTotalCard.textContent = data.memory.total.toFixed(1);
 
             // Disk
             diskChart.data.datasets[0].data = [data.disk.percent, 100 - data.disk.percent];
             diskChart.update();
 
-            document.getElementById('diskUsed').textContent = data.disk.used + ' GB';
-            document.getElementById('diskTotal').textContent = data.disk.total + ' GB';
+            // Update disk card
+            const diskPercentCard = document.getElementById('diskPercentCard');
+            const diskUsedCard = document.getElementById('diskUsedCard');
+            const diskTotalCard = document.getElementById('diskTotalCard');
+            if (diskPercentCard) diskPercentCard.textContent = data.disk.percent.toFixed(1) + '%';
+            if (diskUsedCard) diskUsedCard.textContent = data.disk.used.toFixed(1);
+            if (diskTotalCard) diskTotalCard.textContent = data.disk.total.toFixed(1);
 
             // Network
             if (networkData.length === 0) {
@@ -1312,11 +1331,26 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             networkChart.data.datasets[1].data = networkData.map(d => d.recv);
             networkChart.update();
 
-            document.getElementById('netSent').textContent = data.network.sent + ' MB';
-            document.getElementById('netRecv').textContent = data.network.recv + ' MB';
+            // Update network display
+            const netSent = document.querySelector('#netSent');
+            const netRecv = document.querySelector('#netRecv');
+            if (netSent) netSent.textContent = data.network.sent + ' MB';
+            if (netRecv) netRecv.textContent = data.network.recv + ' MB';
 
-            // System info
-            document.getElementById('processCount').textContent = data.processes;
+            // Update processes card
+            const processCountCard = document.getElementById('processCountCard');
+            if (processCountCard) processCountCard.textContent = data.processes;
+
+            // Update sidebar
+            const sidebarCpu = document.getElementById('sidebarCpuPercent');
+            const sidebarMemory = document.getElementById('sidebarMemoryPercent');
+            const sidebarDisk = document.getElementById('sidebarDiskPercent');
+            const sidebarProcess = document.getElementById('sidebarProcessCount');
+
+            if (sidebarCpu) sidebarCpu.textContent = data.cpu.percent.toFixed(1) + '%';
+            if (sidebarMemory) sidebarMemory.textContent = data.memory.percent.toFixed(1) + '%';
+            if (sidebarDisk) sidebarDisk.textContent = data.disk.percent.toFixed(1) + '%';
+            if (sidebarProcess) sidebarProcess.textContent = data.processes;
 
             // Update welcome message stats
             updateWelcomeMessage(data);
