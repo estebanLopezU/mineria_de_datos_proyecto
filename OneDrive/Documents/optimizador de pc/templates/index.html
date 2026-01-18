@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimizador de PC</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
 </head>
 <body>
     <div class="container">
         <h1>Optimizador Avanzado de PC</h1>
         <p>Selecciona las optimizaciones que deseas realizar:</p>
+
+        <div class="disk-visualization">
+            <div class="disk-3d">
+                <div class="disk-cylinder"></div>
+            </div>
+            <div class="disk-label">Disco Duro Virtual</div>
+        </div>
         <form action="/optimize" method="post">
             <h3>Optimizaciones Básicas</h3>
             <div class="option">
