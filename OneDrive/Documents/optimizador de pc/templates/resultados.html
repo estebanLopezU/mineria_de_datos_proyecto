@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - Optimizador de PC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Resultados de Optimización</h1>
+        {% if resultados.info_sistema %}
+        <h2>Información del Sistema</h2>
+        <p>CPU: {{ resultados.info_sistema.cpu }} núcleos</p>
+        <p>Memoria total: {{ resultados.info_sistema.memoria|round(2) }} GB</p>
+        <p>Disco total: {{ resultados.info_sistema.disco|round(2) }} GB</p>
+        {% endif %}
+
+        {% if resultados.limpiar_temp %}
+        <h2>Limpieza de Archivos Temporales</h2>
+        <p>Archivos eliminados: {{ resultados.limpiar_temp.eliminados }}</p>
+        <p>Errores: {{ resultados.limpiar_temp.errores }}</p>
+        {% endif %}
+
+        {% if resultados.vaciar_papelera %}
+        <h2>Papelera de Reciclaje</h2>
+        <p>{{ resultados.vaciar_papelera.mensaje }}</p>
+        {% endif %}
+
+        {% if resultados.programas_inicio %}
+        <h2>Programas de Inicio</h2>
+        <ul>
+            {% for prog in resultados.programas_inicio %}
+            <li>{{ prog }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a href="/">Volver</a>
+    </div>
+</body>
+</html>
