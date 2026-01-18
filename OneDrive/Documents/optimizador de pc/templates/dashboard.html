@@ -345,44 +345,89 @@
             // Análisis inteligente basado en estadísticas
             let response = '';
 
-            if (q.includes('cpu') || q.includes('procesador')) {
-                if (stats.cpu.percent > 80) {
-                    response = `⚠️ Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, lo cual es alto. Te recomiendo cerrar programas innecesarios y ejecutar la optimización de procesos.`;
-                } else if (stats.cpu.percent > 50) {
-                    response = `📊 Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, funcionando normalmente. Si notas lentitud, considera limpiar archivos temporales.`;
+            // Palabras clave para cada componente
+            const cpuKeywords = ['cpu', 'procesador', 'procesador central', 'microprocesador'];
+            const memoryKeywords = ['memoria', 'ram', 'memoria ram', 'memoria principal'];
+            const diskKeywords = ['disco', 'disco duro', 'almacenamiento', 'disco duro', 'ssd', 'hdd'];
+            const networkKeywords = ['red', 'internet', 'conexión', 'wifi', 'redes'];
+            const processKeywords = ['procesos', 'programas', 'aplicaciones', 'tareas'];
+            const optimizeKeywords = ['optimizar', 'mejorar', 'optimizar pc', 'mejorar rendimiento', 'acelerar'];
+
+            const hasKeyword = (keywords) => keywords.some(keyword => q.includes(keyword));
+
+            if (hasKeyword(cpuKeywords)) {
+                const usage = stats.cpu.percent;
+                if (usage > 90) {
+                    response = `🚨 ¡ALERTA CRÍTICA! Tu CPU está al ${usage.toFixed(1)}%, lo cual es extremadamente alto. Esto puede causar inestabilidad. Te recomiendo:\n• Cerrar inmediatamente programas innecesarios\n• Ejecutar optimización de procesos\n• Revisar si hay malware\n• Considerar reiniciar el sistema`;
+                } else if (usage > 80) {
+                    response = `⚠️ Tu CPU está muy alta al ${usage.toFixed(1)}%. Te recomiendo:\n• Cerrar programas que no uses\n• Ejecutar limpieza de archivos temporales\n• Desactivar programas de inicio innecesarios`;
+                } else if (usage > 60) {
+                    response = `📊 Tu CPU está al ${usage.toFixed(1)}%, funcionando con carga moderada. Si notas lentitud:\n• Limpia archivos temporales\n• Verifica procesos en el administrador de tareas\n• Considera actualizar controladores`;
+                } else if (usage > 30) {
+                    response = `✅ Tu CPU está funcionando bien al ${usage.toFixed(1)}%. Rendimiento normal.`;
                 } else {
-                    response = `✅ Tu CPU está funcionando óptimamente al ${stats.cpu.percent.toFixed(1)}%. ¡Excelente rendimiento!`;
+                    response = `🌟 ¡Excelente! Tu CPU está prácticamente inactiva al ${usage.toFixed(1)}%. Rendimiento óptimo.`;
                 }
-            } else if (q.includes('memoria') || q.includes('ram')) {
-                if (stats.memory.percent > 85) {
-                    response = `🚨 Tu memoria RAM está casi llena (${stats.memory.percent.toFixed(1)}%). Cierra aplicaciones innecesarias y ejecuta la limpieza de memoria.`;
-                } else if (stats.memory.percent > 70) {
-                    response = `⚠️ Tu memoria RAM está al ${stats.memory.percent.toFixed(1)}%. Considera cerrar algunos programas para mejorar el rendimiento.`;
+            } else if (hasKeyword(memoryKeywords)) {
+                const usage = stats.memory.percent;
+                if (usage > 95) {
+                    response = `🚨 ¡MEMORIA CRÍTICA! ${usage.toFixed(1)}% de uso. Riesgo de bloqueo inminente:\n• Cierra TODOS los programas innecesarios\n• Reinicia el navegador web\n• Ejecuta limpieza de memoria inmediatamente\n• Considera agregar más RAM`;
+                } else if (usage > 85) {
+                    response = `⚠️ Memoria RAM casi llena (${usage.toFixed(1)}%). Acciones urgentes:\n• Cierra aplicaciones que no uses\n• Limpia cache del navegador\n• Verifica procesos con alto consumo de memoria`;
+                } else if (usage > 70) {
+                    response = `📊 Memoria RAM con carga alta (${usage.toFixed(1)}%). Recomendaciones:\n• Monitorea procesos en administrador de tareas\n• Limpia archivos temporales\n• Considera cerrar pestañas del navegador`;
+                } else if (usage > 50) {
+                    response = `✅ Memoria RAM en buen estado (${usage.toFixed(1)}% de uso).`;
                 } else {
-                    response = `✅ Tu memoria RAM está en buen estado (${stats.memory.percent.toFixed(1)}% de uso).`;
+                    response = `🌟 ¡Excelente uso de memoria! Solo ${usage.toFixed(1)}% utilizado.`;
                 }
-            } else if (q.includes('disco') || q.includes('almacenamiento')) {
-                if (stats.disk.percent > 90) {
-                    response = `🚨 ¡Tu disco está casi lleno (${stats.disk.percent.toFixed(1)}%)! Te recomiendo ejecutar todas las optimizaciones de limpieza inmediatamente.`;
-                } else if (stats.disk.percent > 75) {
-                    response = `⚠️ Tu disco tiene ${stats.disk.percent.toFixed(1)}% de uso. Considera limpiar archivos temporales y la papelera de reciclaje.`;
+            } else if (hasKeyword(diskKeywords)) {
+                const usage = stats.disk.percent;
+                const freeGB = ((100 - usage) / 100 * stats.disk.total).toFixed(1);
+                if (usage > 95) {
+                    response = `🚨 ¡DISCO CRÍTICO! ${usage.toFixed(1)}% lleno. Solo quedan ${freeGB} GB libres:\n• BORRA ARCHIVOS INNECESARIOS INMEDIATAMENTE\n• Vacía papelera de reciclaje\n• Ejecuta limpieza de disco profunda\n• Mueve archivos a disco externo`;
+                } else if (usage > 90) {
+                    response = `⚠️ Disco casi lleno (${usage.toFixed(1)}%, ${freeGB} GB libres). Acciones necesarias:\n• Limpia archivos temporales\n• Vacía papelera de reciclaje\n• Elimina programas no utilizados\n• Mueve archivos grandes`;
+                } else if (usage > 80) {
+                    response = `📊 Disco con mucho uso (${usage.toFixed(1)}%, ${freeGB} GB libres). Recomendaciones:\n• Ejecuta optimizaciones de limpieza\n• Organiza archivos\n• Considera desfragmentación`;
+                } else if (usage > 60) {
+                    response = `✅ Disco en buen estado (${usage.toFixed(1)}% usado, ${freeGB} GB libres).`;
                 } else {
-                    response = `✅ Tu disco tiene buen espacio disponible (${(100 - stats.disk.percent).toFixed(1)}% libre).`;
+                    response = `🌟 ¡Excelente! Mucho espacio disponible (${(100 - usage).toFixed(1)}% libre, ${freeGB} GB).`;
                 }
-            } else if (q.includes('red') || q.includes('internet') || q.includes('conexión')) {
-                response = `📡 Has enviado ${stats.network.sent} MB y recibido ${stats.network.recv} MB de datos. Si tienes problemas de conexión, verifica tu configuración de red.`;
-            } else if (q.includes('optimizar') || q.includes('mejorar')) {
-                response = `🚀 Para optimizar tu PC, te recomiendo ejecutar: limpieza de archivos temporales, desfragmentación de disco, y limpieza de cache de navegadores. Tu CPU está al ${stats.cpu.percent.toFixed(1)}%, memoria al ${stats.memory.percent.toFixed(1)}%, y disco al ${stats.disk.percent.toFixed(1)}%.`;
-            } else if (q.includes('procesos') || q.includes('programas')) {
-                response = `📋 Tienes ${stats.processes} procesos activos corriendo. Si son muchos, considera cerrar aplicaciones innecesarias para mejorar el rendimiento.`;
-            } else if (q.includes('ayuda') || q.includes('qué puedes') || q.includes('hacer')) {
-                response = `🤖 ¡Hola! Soy OptiBot, tu asistente de optimización. Puedo analizar el rendimiento de tu CPU, memoria, disco y red en tiempo real. Solo pregúntame sobre cualquier componente de tu PC y te daré recomendaciones personalizadas. También puedo explicarte qué significan las estadísticas que ves en los gráficos.`;
-            } else if (q.includes('gracias') || q.includes('thank')) {
-                response = `🙂 ¡De nada! Estoy aquí para ayudarte a mantener tu PC funcionando al máximo rendimiento. Si tienes más preguntas sobre optimización, ¡no dudes en preguntar!`;
-            } else if (q.includes('hola') || q.includes('hi') || q.includes('hello')) {
-                response = `👋 ¡Hola! Soy OptiBot, tu asistente inteligente de optimización de PC. Estoy monitoreando tu sistema en tiempo real. ¿En qué puedo ayudarte hoy?`;
+            } else if (hasKeyword(networkKeywords)) {
+                const sent = stats.network.sent;
+                const recv = stats.network.recv;
+                response = `📡 Información de red:\n• Datos enviados: ${sent} MB\n• Datos recibidos: ${recv} MB\n• Total transferido: ${(sent + recv).toFixed(1)} MB\n\nSi tienes problemas de conexión:\n• Reinicia el router/módem\n• Verifica configuración de red\n• Ejecuta diagnóstico de red\n• Actualiza controladores de red`;
+            } else if (hasKeyword(processKeywords)) {
+                const count = stats.processes;
+                if (count > 200) {
+                    response = `🚨 ¡DEMASIADOS PROCESOS! ${count} procesos activos. Esto puede ralentizar tu PC:\n• Cierra programas innecesarios\n• Desactiva programas de inicio\n• Revisa procesos en administrador de tareas\n• Busca y elimina malware`;
+                } else if (count > 150) {
+                    response = `⚠️ Muchos procesos (${count}). Recomendaciones:\n• Revisa administrador de tareas\n• Desactiva programas de inicio innecesarios\n• Limpia registro de Windows`;
+                } else if (count > 100) {
+                    response = `📊 Número moderado de procesos (${count}). Monitorea el rendimiento.`;
+                } else {
+                    response = `✅ Número óptimo de procesos (${count}). Excelente gestión del sistema.`;
+                }
+            } else if (hasKeyword(optimizeKeywords)) {
+                const cpu = stats.cpu.percent;
+                const mem = stats.memory.percent;
+                const disk = stats.disk.percent;
+                response = `🚀 **PLAN DE OPTIMIZACIÓN PERSONALIZADO**\n\nEstado actual:\n• CPU: ${cpu.toFixed(1)}%\n• Memoria: ${mem.toFixed(1)}%\n• Disco: ${disk.toFixed(1)}%\n\n**Acciones recomendadas:**\n\n1. **Limpieza Básica**\n   • Archivos temporales\n   • Papelera de reciclaje\n   • Prefetch y archivos temporales\n\n2. **Optimizaciones Avanzadas**\n   • Desfragmentación de disco\n   • Limpieza de cache de navegadores\n   • Actualización de Windows\n\n3. **Mantenimiento**\n   • Desactivar programas de inicio\n   • Actualizar controladores\n   • Escaneo de malware\n\n¿Quieres que ejecute alguna optimización específica?`;
+            } else if (q.includes('ayuda') || q.includes('qué puedes') || q.includes('hacer') || q.includes('comandos')) {
+                response = `🤖 **OPTI BOT - TU ASISTENTE DE OPTIMIZACIÓN**\n\nPuedo ayudarte con:\n\n📊 **Análisis en Tiempo Real**\n• CPU, Memoria, Disco, Red\n• Procesos activos\n• Rendimiento general\n\n💡 **Recomendaciones Inteligentes**\n• Diagnóstico automático de problemas\n• Planes de optimización personalizados\n• Consejos preventivos\n\n❓ **Preguntas que puedo responder**\n• "¿Cómo está mi CPU?"\n• "¿Qué optimizaciones recomiendas?"\n• "¿Por qué mi PC está lenta?"\n• "¿Cuánta memoria estoy usando?"\n• "¿Necesito más espacio?"\n\n🔧 **Ejemplos de comandos**\n• Pregúntame sobre cualquier componente\n• Pide recomendaciones específicas\n• Pregúntame sobre el rendimiento\n\n¡Solo escribe tu pregunta y te ayudaré!`;
+            } else if (q.includes('gracias') || q.includes('thank') || q.includes('merci')) {
+                response = `🙂 ¡De nada! Estoy aquí 24/7 para mantener tu PC funcionando perfectamente. Si notas cualquier problema o tienes preguntas sobre optimización, ¡no dudes en preguntarme!\n\n¿Hay algo más en lo que pueda ayudarte?`;
+            } else if (q.includes('hola') || q.includes('hi') || q.includes('hello') || q.includes('buenos') || q.includes('buenas')) {
+                response = `👋 ¡Hola! Soy **OptiBot**, tu asistente inteligente de optimización de PC.\n\nEstoy monitoreando constantemente tu sistema:\n• CPU: ${stats.cpu.percent.toFixed(1)}%\n• Memoria: ${stats.memory.percent.toFixed(1)}%\n• Disco: ${stats.disk.percent.toFixed(1)}%\n• Procesos: ${stats.processes}\n\n¿En qué puedo ayudarte hoy? Pregúntame sobre el rendimiento de tu PC o pide recomendaciones de optimización.`;
+            } else if (q.includes('problema') || q.includes('lenta') || q.includes('lento') || q.includes('error')) {
+                response = `🔍 **DIAGNÓSTICO DE PROBLEMAS**\n\nEstado actual de tu PC:\n• CPU: ${stats.cpu.percent.toFixed(1)}% ${stats.cpu.percent > 80 ? '🔴 ALTO' : stats.cpu.percent > 60 ? '🟡 MODERADO' : '🟢 BUENO'}\n• Memoria: ${stats.memory.percent.toFixed(1)}% ${stats.memory.percent > 85 ? '🔴 CRÍTICO' : stats.memory.percent > 70 ? '🟡 ALTO' : '🟢 BUENO'}\n• Disco: ${stats.disk.percent.toFixed(1)}% ${stats.disk.percent > 90 ? '🔴 LLENO' : stats.disk.percent > 75 ? '🟡 CASI LLENO' : '🟢 BUENO'}\n• Procesos: ${stats.processes} ${stats.processes > 150 ? '🔴 DEMASIADOS' : stats.processes > 100 ? '🟡 MODERADOS' : '🟢 ÓPTIMO'}\n\n**Posibles causas de lentitud:**\n• Alto uso de CPU por programas pesados\n• Memoria insuficiente para multitasking\n• Disco duro fragmentado o casi lleno\n• Muchos procesos ejecutándose\n• Malware o virus\n• Controladores desactualizados\n\n**Soluciones recomendadas:**\n1. Ejecuta optimizaciones completas\n2. Cierra programas innecesarios\n3. Limpia disco y memoria\n4. Actualiza software y controladores\n5. Escanea por malware\n\n¿Quieres que ejecute alguna optimización específica?`;
+            } else if (q.includes('velocidad') || q.includes('rendimiento') || q.includes('performance')) {
+                response = `⚡ **ANÁLISIS DE RENDIMIENTO**\n\nTu PC está funcionando:\n\n**CPU:** ${stats.cpu.percent.toFixed(1)}% de uso\n• Frecuencia: ${stats.cpu.freq_current.toFixed(0)} MHz\n• ${stats.cpu.percent < 50 ? 'Excelente rendimiento' : stats.cpu.percent < 80 ? 'Buen rendimiento' : 'Rendimiento limitado'}\n\n**Memoria:** ${stats.memory.percent.toFixed(1)}% utilizada\n• ${stats.memory.used.toFixed(1)} GB de ${stats.memory.total.toFixed(1)} GB\n• ${stats.memory.percent < 70 ? 'Buena capacidad de memoria' : 'Memoria limitada'}\n\n**Disco:** ${stats.disk.percent.toFixed(1)}% utilizado\n• ${stats.disk.used.toFixed(1)} GB de ${stats.disk.total.toFixed(1)} GB libres\n• Velocidad: ${stats.disk.percent < 80 ? 'Buena velocidad de acceso' : 'Acceso limitado por espacio'}\n\n**Recomendaciones para mejorar velocidad:**\n• Mantén CPU por debajo del 70%\n• Libera al menos 30% de memoria\n• Mantén disco por debajo del 80%\n• Ejecuta mantenimiento semanal\n• Actualiza hardware si es necesario\n\n¿Te gustaría ver recomendaciones específicas?`;
             } else {
-                response = `🤔 No entendí completamente tu pregunta. Puedo ayudarte con información sobre CPU, memoria RAM, disco duro, red, procesos activos, y recomendaciones de optimización. También puedo explicar cualquier estadística que veas en el dashboard. ¡Prueba preguntarme algo específico!`;
+                // Respuesta genérica pero útil
+                response = `🤔 **${question}**\n\nNo entendí completamente tu pregunta, pero puedo analizar tu sistema:\n\n📊 **Estado Actual:**\n• CPU: ${stats.cpu.percent.toFixed(1)}%\n• Memoria: ${stats.memory.percent.toFixed(1)}%\n• Disco: ${stats.disk.percent.toFixed(1)}%\n• Procesos: ${stats.processes}\n\n💡 **Puedo ayudarte con:**\n• Análisis detallado de cualquier componente\n• Recomendaciones de optimización\n• Diagnóstico de problemas de rendimiento\n• Consejos para mejorar velocidad\n\n**Prueba preguntando:**\n• "¿Cómo está mi CPU?"\n• "¿Qué optimizaciones recomiendas?"\n• "¿Por qué mi PC está lenta?"\n• "¿Cómo mejorar el rendimiento?"\n\n¡Solo dime qué necesitas saber!`;
             }
 
             return response;
