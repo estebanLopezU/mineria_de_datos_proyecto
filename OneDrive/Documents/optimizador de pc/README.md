@@ -21,6 +21,14 @@ pip install -r requirements.txt
 
 ## Uso
 
+### Interfaz Web (Recomendado)
+Ejecutar la aplicación web:
+```
+python app.py
+```
+Abre tu navegador en http://127.0.0.1:5000/
+
+### Consola
 Ejecutar el script principal:
 ```
 python main.py
