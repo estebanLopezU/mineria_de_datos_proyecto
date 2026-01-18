@@ -23,6 +23,18 @@ h1 {
     text-align: center;
 }
 
+h2 {
+    color: #555;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 5px;
+}
+
+h3 {
+    color: #4CAF50;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
 .option {
     margin: 10px 0;
 }

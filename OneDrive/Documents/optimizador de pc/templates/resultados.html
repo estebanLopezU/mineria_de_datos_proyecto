@@ -36,7 +36,34 @@
         </ul>
         {% endif %}
 
-        <a href="/">Volver</a>
+        {% if resultados.desfragmentar %}
+        <h2>Desfragmentación de Disco</h2>
+        <p>{{ resultados.desfragmentar.mensaje }}</p>
+        {% endif %}
+
+        {% if resultados.limpiar_prefetch %}
+        <h2>Limpieza de Prefetch</h2>
+        <p>Archivos eliminados: {{ resultados.limpiar_prefetch.eliminados }}</p>
+        <p>Errores: {{ resultados.limpiar_prefetch.errores }}</p>
+        {% endif %}
+
+        {% if resultados.limpiar_cache_nav %}
+        <h2>Limpieza de Cache de Navegadores</h2>
+        <p>Chrome: {{ resultados.limpiar_cache_nav.chrome }}</p>
+        <p>Firefox: {{ resultados.limpiar_cache_nav.firefox }}</p>
+        {% endif %}
+
+        {% if resultados.limpiar_windows_update %}
+        <h2>Limpieza de Windows Update</h2>
+        <p>{{ resultados.limpiar_windows_update.mensaje }}</p>
+        {% endif %}
+
+        {% if resultados.espacio_liberado %}
+        <h2>Espacio Liberado</h2>
+        <p>{{ resultados.espacio_liberado.espacio_estimado }}</p>
+        {% endif %}
+
+        <a href="/">Volver al Inicio</a>
     </div>
 </body>
 </html>

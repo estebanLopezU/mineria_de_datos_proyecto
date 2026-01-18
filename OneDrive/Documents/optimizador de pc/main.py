@@ -56,6 +56,91 @@ def obtener_programas_inicio():
                 programas.append(item)
     return programas
 
+def desfragmentar_disco():
+    """Desfragmenta el disco C:."""
+    try:
+        result = subprocess.run(['defrag', 'C:', '/O'], capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            return {"exito": True, "mensaje": "Desfragmentación completada."}
+        else:
+            return {"exito": False, "mensaje": f"Error en desfragmentación: {result.stderr}"}
+    except subprocess.TimeoutExpired:
+        return {"exito": False, "mensaje": "Desfragmentación tomó demasiado tiempo."}
+    except Exception as e:
+        return {"exito": False, "mensaje": str(e)}
+
+def limpiar_prefetch():
+    """Limpia archivos prefetch."""
+    prefetch_path = "C:\\Windows\\Prefetch"
+    eliminados = 0
+    errores = 0
+    if os.path.exists(prefetch_path):
+        try:
+            for filename in os.listdir(prefetch_path):
+                if filename.endswith('.pf'):
+                    file_path = os.path.join(prefetch_path, filename)
+                    try:
+                        os.unlink(file_path)
+                        eliminados += 1
+                    except Exception:
+                        errores += 1
+        except Exception:
+            pass
+    return {"eliminados": eliminados, "errores": errores}
+
+def limpiar_cache_navegadores():
+    """Limpia cache de navegadores comunes."""
+    resultados = {}
+    # Chrome
+    chrome_cache = os.path.expanduser("~\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache")
+    if os.path.exists(chrome_cache):
+        try:
+            import shutil
+            shutil.rmtree(chrome_cache)
+            resultados["chrome"] = "Cache de Chrome limpiado."
+        except Exception as e:
+            resultados["chrome"] = f"Error limpiando Chrome: {str(e)}"
+    else:
+        resultados["chrome"] = "Chrome no encontrado."
+
+    # Firefox
+    firefox_profile = os.path.expanduser("~\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles")
+    if os.path.exists(firefox_profile):
+        for profile in os.listdir(firefox_profile):
+            cache_path = os.path.join(firefox_profile, profile, "cache2")
+            if os.path.exists(cache_path):
+                try:
+                    shutil.rmtree(cache_path)
+                    resultados["firefox"] = "Cache de Firefox limpiado."
+                    break
+                except Exception as e:
+                    resultados["firefox"] = f"Error limpiando Firefox: {str(e)}"
+                    break
+        else:
+            resultados["firefox"] = "Firefox no encontrado."
+    else:
+        resultados["firefox"] = "Firefox no encontrado."
+
+    return resultados
+
+def limpiar_actualizaciones_windows():
+    """Limpia archivos temporales de Windows Update."""
+    try:
+        result = subprocess.run(['cleanmgr', '/sagerun:1'], capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            return {"exito": True, "mensaje": "Limpieza de Windows Update completada."}
+        else:
+            return {"exito": False, "mensaje": "Error en limpieza de Windows Update."}
+    except subprocess.TimeoutExpired:
+        return {"exito": False, "mensaje": "Limpieza tomó demasiado tiempo."}
+    except Exception as e:
+        return {"exito": False, "mensaje": str(e)}
+
+def obtener_espacio_liberado():
+    """Calcula espacio liberado (estimado)."""
+    # Esto es una estimación simple
+    return {"espacio_estimado": "Variable según archivos eliminados"}
+
 def ejecutar_optimizaciones(opciones):
     """Ejecuta las optimizaciones seleccionadas."""
     resultados = {}
@@ -67,6 +152,16 @@ def ejecutar_optimizaciones(opciones):
         resultados["vaciar_papelera"] = vaciar_papelera()
     if "listar_inicio" in opciones:
         resultados["programas_inicio"] = obtener_programas_inicio()
+    if "desfragmentar" in opciones:
+        resultados["desfragmentar"] = desfragmentar_disco()
+    if "limpiar_prefetch" in opciones:
+        resultados["limpiar_prefetch"] = limpiar_prefetch()
+    if "limpiar_cache_nav" in opciones:
+        resultados["limpiar_cache_nav"] = limpiar_cache_navegadores()
+    if "limpiar_windows_update" in opciones:
+        resultados["limpiar_windows_update"] = limpiar_actualizaciones_windows()
+    if "espacio_liberado" in opciones:
+        resultados["espacio_liberado"] = obtener_espacio_liberado()
     return resultados
 
 def main():

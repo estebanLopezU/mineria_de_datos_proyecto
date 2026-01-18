@@ -8,9 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Optimizador de PC</h1>
+        <h1>Optimizador Avanzado de PC</h1>
         <p>Selecciona las optimizaciones que deseas realizar:</p>
         <form action="/optimize" method="post">
+            <h3>Optimizaciones Básicas</h3>
             <div class="option">
                 <input type="checkbox" id="info_sistema" name="info_sistema" checked>
                 <label for="info_sistema">Obtener información del sistema</label>
@@ -27,7 +28,29 @@
                 <input type="checkbox" id="listar_inicio" name="listar_inicio" checked>
                 <label for="listar_inicio">Listar programas de inicio</label>
             </div>
-            <button type="submit">Optimizar</button>
+
+            <h3>Optimizaciones Avanzadas</h3>
+            <div class="option">
+                <input type="checkbox" id="desfragmentar" name="desfragmentar">
+                <label for="desfragmentar">Desfragmentar disco duro</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="limpiar_prefetch" name="limpiar_prefetch">
+                <label for="limpiar_prefetch">Limpiar archivos prefetch</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="limpiar_cache_nav" name="limpiar_cache_nav">
+                <label for="limpiar_cache_nav">Limpiar cache de navegadores</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="limpiar_windows_update" name="limpiar_windows_update">
+                <label for="limpiar_windows_update">Limpiar archivos de Windows Update</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="espacio_liberado" name="espacio_liberado">
+                <label for="espacio_liberado">Calcular espacio liberado</label>
+            </div>
+            <button type="submit">Ejecutar Optimización</button>
         </form>
     </div>
 </body>
