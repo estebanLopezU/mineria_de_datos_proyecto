@@ -974,16 +974,17 @@ Como asistente inteligente, puedo ayudarte con información sobre:
             const deltaY = currentY - dragStartY;
 
             const aiAssistant = document.querySelector('.ai-assistant');
-            const newX = initialX + deltaX;
-            const newY = initialY + deltaY;
+            const dashboardContainer = document.querySelector('.container');
 
-            // Keep within viewport bounds
-            const maxX = window.innerWidth - aiAssistant.offsetWidth;
-            const maxY = window.innerHeight - aiAssistant.offsetHeight;
+            // Calculate relative position within the dashboard container
+            const containerRect = dashboardContainer.getBoundingClientRect();
+            const assistantRect = aiAssistant.getBoundingClientRect();
 
-            aiAssistant.style.left = Math.max(0, Math.min(newX, maxX)) + 'px';
-            aiAssistant.style.top = Math.max(0, Math.min(newY, maxY)) + 'px';
-            aiAssistant.style.position = 'fixed';
+            const newX = Math.max(containerRect.left, Math.min(initialX + deltaX, containerRect.right - assistantRect.width));
+            const newY = Math.max(containerRect.top, Math.min(initialY + deltaY, containerRect.bottom - assistantRect.height));
+
+            // Move within dashboard bounds (not viewport)
+            aiAssistant.style.transform = `translate(${newX - initialX}px, ${newY - initialY}px)`;
         }
 
         function endDrag() {
