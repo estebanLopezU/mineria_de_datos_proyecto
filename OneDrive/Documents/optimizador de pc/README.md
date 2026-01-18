@@ -81,6 +81,25 @@ El dashboard incluye un asistente inteligente conversacional que:
 
 OptiBot combina el conocimiento especializado en optimización de PC con la capacidad de mantener conversaciones naturales sobre cualquier tema, ¡como un ChatGPT especializado en tu sistema!
 
+## 🎨 Características Avanzadas del Chat
+
+### **📱 Interfaz Móvil y Arrastrable**
+- **Arrastrar como WhatsApp:** Mueve el chat arrastrando desde el título
+- **Responsive:** Se adapta perfectamente a móviles y tablets
+- **Posicionamiento flotante:** Se mantiene fijo en la pantalla
+
+### **😊 Barra de Emojis Interactiva**
+- **8 emojis principales:** 😊 👍 ❤️ 😂 😮 🙏 🔧 💻
+- **Inserción automática:** Haz clic para agregar al mensaje
+- **Expresividad:** Mejora la comunicación natural
+
+### **⚡ Experiencia de Chat Fluida**
+- **Indicadores de escritura:** "OptiBot está escribiendo..." con animación
+- **Timestamps en tiempo real:** Cada mensaje con hora exacta
+- **Historial inteligente:** Mantiene los últimos 15 mensajes
+- **Auto-scroll:** Se desplaza automáticamente a mensajes nuevos
+- **Estados visuales:** Feedback visual durante envío y recepción
+
 Si prefieres ejecutar solo la versión web sin auto-abrir navegador:
 ```
 python app.py
