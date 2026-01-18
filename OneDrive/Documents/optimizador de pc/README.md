@@ -35,14 +35,38 @@ python main.py
 ```
 Esto iniciará automáticamente la interfaz web y abrirá tu navegador en http://127.0.0.1:5000/
 
-## Dashboard de Monitoreo en Tiempo Real
-Accede al dashboard para ver estadísticas en tiempo real del sistema:
-- **CPU**: Uso porcentual y frecuencia
-- **Memoria RAM**: Uso y capacidad total
-- **Disco Duro**: Espacio usado y disponible
-- **Red**: Datos enviados y recibidos
-- **Procesos**: Número de procesos activos
-- **Información del sistema**: Uptime, versión del SO, etc.
+## 🎨 Dashboard Moderno con Bootstrap
+
+### **Interfaz Profesional y Responsiva**
+El dashboard cuenta con un diseño moderno construido con **Bootstrap 5**, ofreciendo:
+
+#### **Navegación Lateral**
+- **Sidebar colapsable** con menú intuitivo
+- **Indicadores en tiempo real** del estado del sistema
+- **Navegación fluida** entre secciones
+
+#### **Layout de Tarjetas**
+- **4 tarjetas principales** para métricas clave (CPU, RAM, Disco, Procesos)
+- **Colores temáticos** (Azul, Verde, Amarillo, Rojo)
+- **Iconos Bootstrap** para mejor visualización
+- **Animaciones de carga** y transiciones suaves
+
+#### **Gráficos Interactivos**
+- **Gráfico principal de CPU** con historial de 20 puntos
+- **Gráficos circulares** para memoria y disco
+- **Gráfico de red** con datos enviados/recibidos
+- **Actualización automática** cada 2 segundos
+
+#### **Información del Sistema**
+- **Panel completo** con uptime, versiones y estado
+- **Indicadores visuales** con badges de colores
+- **Información contextual** del sistema operativo
+
+### **📱 Diseño Responsivo**
+- **Desktop**: Layout completo con sidebar expandido
+- **Tablet**: Sidebar colapsable, grid adaptativo
+- **Móvil**: Sidebar oculto, navegación móvil, tarjetas apiladas
+- **Puntos de quiebre** inteligentes para diferentes tamaños
 
 ## 🤖 Asistente IA OptiBot - Tu ChatGPT Personal
 El dashboard incluye un asistente inteligente conversacional que:
