@@ -21,18 +21,19 @@ pip install -r requirements.txt
 
 ## Uso
 
-### Interfaz Web (Recomendado)
-Ejecutar la aplicación web:
-```
-python app.py
-```
-Abre tu navegador en http://127.0.0.1:5000/
-
-### Consola
-Ejecutar el script principal:
+Ejecuta el proyecto:
 ```
 python main.py
 ```
+Esto iniciará automáticamente la interfaz web y abrirá tu navegador en http://127.0.0.1:5000/
+
+Si prefieres ejecutar solo la versión web sin auto-abrir navegador:
+```
+python app.py
+```
+
+Para la versión de consola (sin interfaz gráfica):
+Crea un script separado o modifica el código según necesites.
 
 ## Contribución
 

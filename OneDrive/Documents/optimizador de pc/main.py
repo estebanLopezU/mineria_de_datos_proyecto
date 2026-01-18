@@ -94,4 +94,17 @@ def main():
     print("Optimización completada.")
 
 if __name__ == "__main__":
-    main()
+    # Iniciar la aplicación web automáticamente
+    from app import app
+    import webbrowser
+    import threading
+    import time
+
+    def open_browser():
+        time.sleep(1.5)  # Esperar a que el servidor inicie
+        webbrowser.open('http://127.0.0.1:5000/')
+
+    # Iniciar hilo para abrir navegador
+    threading.Thread(target=open_browser, daemon=True).start()
+    # Ejecutar la aplicación web
+    app.run(debug=True, host='0.0.0.0', port=5000)
