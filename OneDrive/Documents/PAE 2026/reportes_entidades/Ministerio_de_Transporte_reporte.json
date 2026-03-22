@@ -1,0 +1,34 @@
+{
+  "entidad": "Ministerio de Transporte",
+  "fecha_generacion": "2026-03-21T19:24:04.594613",
+  "sector": "Transporte",
+  "analisis": {
+    "nivel_madurez": 2,
+    "promedio_sectorial": 2.0,
+    "desviacion_estandar_sectorial": NaN,
+    "posicion_relativa": "Bueno (Por encima del promedio)"
+  },
+  "conectividad": {
+    "xroad": "No",
+    "scd": "No",
+    "sector_xroad_pct": 0.0,
+    "sector_scd_pct": 0.0
+  },
+  "diagnostico": {
+    "fortalezas": [],
+    "areas_mejora": [
+      "Nivel de madurez bajo (requiere atención prioritaria)",
+      "Falta conexión a X-Road",
+      "No implementa Servicios Ciudadanos Digitales"
+    ]
+  },
+  "recomendaciones": [
+    "Priorizar capacitación en X-Road y estandarización semántica",
+    "Implementar plan de mejora continua de interoperabilidad",
+    "Establecer metas claras de madurez a corto y mediano plazo",
+    "Conectar prioritariamente a la plataforma X-Road",
+    "Evaluar requisitos técnicos para integración segura",
+    "Integrar servicios ciudadanos digitales",
+    "Mejorar experiencia de usuario en trámites digitales"
+  ]
+}

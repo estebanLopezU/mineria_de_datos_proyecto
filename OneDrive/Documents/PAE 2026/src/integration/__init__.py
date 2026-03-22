@@ -1,0 +1,1 @@
+# Integración con APIs externas (X-Road, SCD, APIs Gubernamentales)

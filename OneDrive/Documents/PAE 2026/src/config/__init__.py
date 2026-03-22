@@ -1,0 +1,1 @@
+# Configuración del sistema y variables de entorno
