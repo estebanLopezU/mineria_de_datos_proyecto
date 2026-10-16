@@ -91,7 +91,8 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 .stats-section{margin-top:16px}
 .stats-carousel{position:relative;overflow:hidden;margin-top:10px;border:1px solid #22344f;border-radius:14px;background:rgba(19,31,54,.6)}
 .stats-track{display:flex;transition:transform .45s ease;will-change:transform}
-.stats-card{min-width:100%;padding:16px;box-sizing:border-box;display:flex;flex-direction:column}
+.stats-card{min-width:100%;padding:16px;box-sizing:border-box;display:flex;flex-direction:column;transition:background .2s}
+.stats-card:hover{background:rgba(29,78,216,.15)}
 .stats-title{font-weight:800;color:#7dd3fc;margin-bottom:10px;font-size:1.1rem;border-bottom:1px solid #22344f;padding-bottom:6px}
 .stats-table{width:100%;border-collapse:collapse;font-size:.9rem}
 .stats-table th{text-align:left;color:#94a3b8;width:42%}
@@ -237,7 +238,7 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
     <button class="stats-nav prev">&#10094;</button>
     <div class="stats-track">
       {% for nombre, s in stats.items %}
-      <div class="stats-card">
+      <div class="stats-card" data-sensor="{{ nombre }}" onclick="graficarSensor(this.dataset.sensor)" style="cursor:pointer">
         <div class="stats-title">{{ nombre|title }}</div>
         <table class="stats-table">
           {% if nombre == "precipitacion" %}
@@ -265,6 +266,7 @@ IP <code>192.168.137.1</code> puerto <code>5000</code> path <code>/weatherstatio
 {% endif %}
 <div class="ayuda"><strong>Endpoints:</strong> <code>GET /api/v1/ambient/ultima/</code> · <code>GET /api/v1/ambient/serie/</code></div>
 </div>
+<script id="series-data" type="application/json">{{ series|json_script:"series-data" }}</script>
 <script>
 (function(){
 function reloj(){
@@ -400,7 +402,34 @@ function statsCarousel(){
   });
   mover(0);
 }
+function graficarSensor(nombre){
+  var series=window.__series||{}, pts=(series[nombre]||[]).filter(function(p){return p[1]!=null;});
+  if(!pts.length) return;
+  var cv=document.getElementById('graf');
+  if(!cv) return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.clientWidth*2,H=cv.height=220;
+  var ts=pts.map(function(p){return new Date(p[0]).getTime();});
+  var vs=pts.map(function(p){return p[1];});
+  var t0=Math.min.apply(null,ts),t1=(Math.max.apply(null,ts)||t0+1);
+  var v0=Math.min.apply(null,vs),v1=(Math.max.apply(null,vs)||v0+1);
+  function X(t){return (t-t0)/(t1-t0)*(W-80)+60;}
+  function Y(v){return H-40-(v-v0)/((v1-v0)||1)*(H-80);}
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(148,163,184,.4)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(60,10);ctx.lineTo(60,H-40);ctx.lineTo(W-10,H-40);ctx.stroke();
+  ctx.strokeStyle='#38bdf8';ctx.lineWidth=3;ctx.beginPath();
+  pts.forEach(function(p,i){var x=X(new Date(p[0]).getTime()),y=Y(p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+  ctx.fillStyle='#e2e8f0';ctx.font='20px sans-serif';
+  ctx.fillText(v1.toFixed(1)+' máx',8,Y(v1)-8);
+  ctx.fillText(v0.toFixed(1)+' mín',8,Y(v0)+26);
+  ctx.fillStyle='#7dd3fc';ctx.font='14px sans-serif';
+  ctx.fillText(nombre.replace(/_/g,' '),W-170,20);
+}
+window.__series=JSON.parse(document.getElementById('series-data').textContent||'{}');
 statsCarousel();
+graficarSensor('temperatura');
 viva();graf();setInterval(viva,15000);setInterval(graf,30000);
 fetchPronostico();setInterval(fetchPronostico,600000);
 })();

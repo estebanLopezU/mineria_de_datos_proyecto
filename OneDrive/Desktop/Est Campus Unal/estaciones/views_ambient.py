@@ -304,6 +304,14 @@ def _detalle(request, est, device_id):
             dirs = [f.direccion_viento for f in filas_dia if f.direccion_viento is not None]
             if dirs:
                 stats["direccion_viento"]["dominante"] = Counter(dirs).most_common(1)[0][0]
+            # Series temporales del día para graficar cada sensor en #graf.
+            attrs_series = ["temperatura", "humedad_relativa", "presion_barometrica",
+                            "velocidad_viento", "radiacion_solar", "precipitacion"]
+            series = {a: [] for a in attrs_series}
+            for f in filas_dia:
+                ts = timezone.localtime(f.timestamp).isoformat()
+                for a in attrs_series:
+                    series[a].append([ts, getattr(f, a)])
         recientes = list(
             Lectura.objects.filter(estacion=est)
             .order_by("-timestamp")
@@ -346,6 +354,7 @@ def _detalle(request, est, device_id):
     ctx = {
         "estacion": est,
         "stats": stats if ultima is not None else None,
+        "series": series if ultima is not None else {},
         "codigo": AMBIENT_CODIGO,
         "device_id": device_id,
         "ultima": ultima,
