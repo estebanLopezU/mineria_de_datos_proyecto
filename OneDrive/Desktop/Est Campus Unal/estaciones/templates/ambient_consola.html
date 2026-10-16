@@ -336,7 +336,7 @@ set('v-pre',j.presion_barometrica,1); set('v-pabs',j.presion_absoluta,1);
 // pagina cuando entra un dato mas nuevo (asi todo queda sincronizado).
 var vl=document.getElementById('vivo-linea');
 if(vl&&j.timestamp) vl.textContent='Ultimo: '+j.timestamp+' - cada 15 s';
-if(j.timestamp && window.__ultTs && j.timestamp!==window.__ultTs){ location.reload(); return; }
+// No recargar la pagina al llegar un dato nuevo: romperia el carrusel de estadisticas.
 window.__ultTs=j.timestamp||window.__ultTs;
 }catch(e){}
 }
@@ -404,29 +404,31 @@ function statsCarousel(){
   mover(0);
 }
 function graficarSensor(nombre){
-  var series=window.__series||{}, pts=(series[nombre]||[]).filter(function(p){return p[1]!=null;});
-  if(!pts.length) return;
-  var cv=document.getElementById('graf');
-  if(!cv) return;
-  var ctx=cv.getContext('2d');
-  var W=cv.width=cv.clientWidth*2,H=cv.height=220;
-  var ts=pts.map(function(p){return new Date(p[0]).getTime();});
-  var vs=pts.map(function(p){return p[1];});
-  var t0=Math.min.apply(null,ts),t1=(Math.max.apply(null,ts)||t0+1);
-  var v0=Math.min.apply(null,vs),v1=(Math.max.apply(null,vs)||v0+1);
-  function X(t){return (t-t0)/(t1-t0)*(W-80)+60;}
-  function Y(v){return H-40-(v-v0)/((v1-v0)||1)*(H-80);}
-  ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='rgba(148,163,184,.4)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(60,10);ctx.lineTo(60,H-40);ctx.lineTo(W-10,H-40);ctx.stroke();
-  ctx.strokeStyle='#38bdf8';ctx.lineWidth=3;ctx.beginPath();
-  pts.forEach(function(p,i){var x=X(new Date(p[0]).getTime()),y=Y(p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-  ctx.stroke();
-  ctx.fillStyle='#e2e8f0';ctx.font='20px sans-serif';
-  ctx.fillText(v1.toFixed(1)+' máx',8,Y(v1)-8);
-  ctx.fillText(v0.toFixed(1)+' mín',8,Y(v0)+26);
-  ctx.fillStyle='#7dd3fc';ctx.font='14px sans-serif';
-  ctx.fillText(nombre.replace(/_/g,' '),W-170,20);
+  try{
+    var series=window.__series||{}, pts=(series[nombre]||[]).filter(function(p){return p[1]!=null;});
+    if(!pts.length){ graf(); return; }
+    var cv=document.getElementById('graf');
+    if(!cv) return;
+    var ctx=cv.getContext('2d');
+    var W=cv.width=cv.clientWidth*2,H=cv.height=220;
+    var ts=pts.map(function(p){return new Date(p[0]).getTime();});
+    var vs=pts.map(function(p){return p[1];});
+    var t0=Math.min.apply(null,ts),t1=(Math.max.apply(null,ts)||t0+1);
+    var v0=Math.min.apply(null,vs),v1=(Math.max.apply(null,vs)||v0+1);
+    function X(t){return (t-t0)/(t1-t0)*(W-80)+60;}
+    function Y(v){return H-40-(v-v0)/((v1-v0)||1)*(H-80);}
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(148,163,184,.4)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(60,10);ctx.lineTo(60,H-40);ctx.lineTo(W-10,H-40);ctx.stroke();
+    ctx.strokeStyle='#38bdf8';ctx.lineWidth=3;ctx.beginPath();
+    pts.forEach(function(p,i){var x=X(new Date(p[0]).getTime()),y=Y(p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.stroke();
+    ctx.fillStyle='#e2e8f0';ctx.font='20px sans-serif';
+    ctx.fillText(v1.toFixed(1)+' máx',8,Y(v1)-8);
+    ctx.fillText(v0.toFixed(1)+' mín',8,Y(v0)+26);
+    ctx.fillStyle='#7dd3fc';ctx.font='14px sans-serif';
+    ctx.fillText(nombre.replace(/_/g,' '),W-170,20);
+  }catch(e){ graf(); }
 }
 window.__series=JSON.parse(document.getElementById('series-data').textContent||'{}');
 statsCarousel();
