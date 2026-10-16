@@ -89,7 +89,9 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 .tabla{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:14px}
 .tabla th,.tabla td{padding:6px 8px;border-bottom:1px solid rgba(148,163,184,.2);text-align:right}
 .tabla th:first-child,.tabla td:first-child{text-align:left}
-.stats-section{margin-top:16px}
+.seccion-inferior{width:100%;margin-top:14px}
+.grafico-container{width:100%;min-height:260px;background:rgba(15,23,42,.6);border:1px solid #22344f;border-radius:14px;margin-top:8px;overflow:hidden}
+.grafico-container canvas{display:block;width:100%;height:100%}
 .stats-carousel{position:relative;overflow:hidden;margin-top:10px;border:1px solid #22344f;border-radius:14px;background:rgba(19,31,54,.6)}
 .stats-track{display:flex;transition:transform .45s ease;will-change:transform}
 .stats-card{min-width:100%;padding:16px;box-sizing:border-box;display:flex;flex-direction:column;transition:background .2s}
@@ -223,9 +225,12 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 </div>
 </div>
 </div>
-<div class="bajo">
+</div>
+<div class="seccion-inferior">
 <div class="vivo" id="vivo-linea">Ultimo: {{ ultima_hora|date:"Y-m-d H:i:s" }} · cada 15 s</div>
+<div class="grafico-container">
 <canvas id="graf"></canvas>
+</div>
 <h3 style="color:#94a3b8">Ultimos reportes</h3>
 <table class="tabla">
 <tr><th>Hora</th><th>Temp</th><th>HR</th><th>Pres</th><th>Viento</th><th>Dir</th><th>Rad</th><th>Lluvia</th></tr>
@@ -258,7 +263,6 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
     </div>
     <button class="stats-nav next">&#10095;</button>
   </div>
-</div>
 </div>
 </div>
 {% else %}
