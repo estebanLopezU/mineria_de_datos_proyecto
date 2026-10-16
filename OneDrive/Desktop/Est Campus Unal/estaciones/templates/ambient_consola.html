@@ -82,7 +82,8 @@ body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:#0b1526;col
 .indoor-grid .ib b{display:block;font-size:1.15rem}
 .pantalla.tarjetas{background:none;border:none;padding:0;box-shadow:none}
 .pantalla.tarjetas .fila1,.pantalla.tarjetas .fila2{display:contents}
-.pantalla.tarjetas .ayuda,.pantalla.tarjetas .tabla,.pantalla.tarjetas #graf{display:none}
+.pantalla.tarjetas .ayuda{display:none}
+.pantalla.tarjetas .bajo{grid-column:1/-1;margin-top:14px}
 body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena="calor"] .card{border-color:#334155}
 .tabla{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:14px}
 .tabla th,.tabla td{padding:6px 8px;border-bottom:1px solid rgba(148,163,184,.2);text-align:right}
@@ -208,6 +209,7 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 </div>
 </div>
 </div>
+<div class="bajo">
 <div class="vivo" id="vivo-linea">Ultimo: {{ ultima_hora|date:"Y-m-d H:i:s" }} · cada 15 s</div>
 <canvas id="graf"></canvas>
 <h3 style="color:#94a3b8">Ultimos reportes</h3>
@@ -217,6 +219,7 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 <tr><td>{{ r.timestamp|date:"m-d H:i:s" }}</td><td>{{ r.temperatura|default:"—" }}</td><td>{{ r.humedad_relativa|default:"—" }}</td><td>{{ r.presion_barometrica|default:"—" }}</td><td>{{ r.velocidad_viento|default:"—" }}</td><td>{{ r.direccion_viento|default:"—" }}</td><td>{{ r.radiacion_solar|default:"—" }}</td><td>{{ r.precipitacion|default:"—" }}</td></tr>
 {% endfor %}
 </table>
+</div>
 </div>
 {% else %}
 <div class="ayuda"><strong>Aun no hay datos del Ambient.</strong><br>
