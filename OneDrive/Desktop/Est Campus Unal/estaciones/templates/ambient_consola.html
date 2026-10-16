@@ -88,6 +88,18 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 .tabla{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:14px}
 .tabla th,.tabla td{padding:6px 8px;border-bottom:1px solid rgba(148,163,184,.2);text-align:right}
 .tabla th:first-child,.tabla td:first-child{text-align:left}
+.stats-section{margin-top:16px}
+.stats-carousel{position:relative;overflow:hidden;margin-top:10px;border:1px solid #22344f;border-radius:14px;background:rgba(19,31,54,.6)}
+.stats-track{display:flex;transition:transform .45s ease;will-change:transform}
+.stats-card{min-width:100%;padding:16px;box-sizing:border-box;display:flex;flex-direction:column}
+.stats-title{font-weight:800;color:#7dd3fc;margin-bottom:10px;font-size:1.1rem;border-bottom:1px solid #22344f;padding-bottom:6px}
+.stats-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.stats-table th{text-align:left;color:#94a3b8;width:42%}
+.stats-table td{color:#fff;padding:7px 0;border-bottom:1px solid rgba(148,163,184,.15)}
+.stats-nav{position:absolute;top:50%;transform:translateY(-50%);background:#1d4ed8;border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;z-index:10;font-size:1.2rem;line-height:1}
+.stats-nav.prev{left:10px}
+.stats-nav.next{right:10px}
+.stats-nav:hover{background:#38bdf8}
 .ayuda{background:rgba(30,41,59,.85);border:1px dashed rgba(148,163,184,.4);border-radius:12px;padding:14px;margin:18px 0}
 .ayuda code{background:#0f172a;padding:2px 6px;border-radius:6px}
 #graf{width:100%;height:220px;background:rgba(15,23,42,.78);border:1px solid rgba(148,163,184,.25);border-radius:14px;margin-top:12px}
@@ -219,6 +231,32 @@ body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena
 <tr><td>{{ r.timestamp|date:"m-d H:i:s" }}</td><td>{{ r.temperatura|default:"—" }}</td><td>{{ r.humedad_relativa|default:"—" }}</td><td>{{ r.presion_barometrica|default:"—" }}</td><td>{{ r.velocidad_viento|default:"—" }}</td><td>{{ r.direccion_viento|default:"—" }}</td><td>{{ r.radiacion_solar|default:"—" }}</td><td>{{ r.precipitacion|default:"—" }}</td></tr>
 {% endfor %}
 </table>
+<div class="stats-section">
+  <h3>Estadísticas del día</h3>
+  <div class="stats-carousel">
+    <button class="stats-nav prev">&#10094;</button>
+    <div class="stats-track">
+      {% for nombre, s in stats.items %}
+      <div class="stats-card">
+        <div class="stats-title">{{ nombre|title }}</div>
+        <table class="stats-table">
+          {% if nombre == "precipitacion" %}
+          <tr><th>Total día</th><td>{{ s.total|default:"--" }}</td></tr>
+          <tr><th>Máx tasa</th><td>{{ s.max_rate|default:"--" }}</td></tr>
+          {% elif nombre == "direccion_viento" %}
+          <tr><th>Dirección dom.</th><td>{{ s.dominante|default:"--" }}</td></tr>
+          {% else %}
+          <tr><th>Máx</th><td>{{ s.max|default:"--" }}</td></tr>
+          <tr><th>Mín</th><td>{{ s.min|default:"--" }}</td></tr>
+          <tr><th>Prom</th><td>{{ s.avg|default:"--" }}</td></tr>
+          {% endif %}
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="stats-nav next">&#10095;</button>
+  </div>
+</div>
 </div>
 </div>
 {% else %}
@@ -352,6 +390,17 @@ function fetchPronostico(){
     });
   }).catch(function(){msg.style.display='';});}catch(e){}
 }
+function statsCarousel(){
+  var track=document.querySelector('.stats-track'), cards=document.querySelectorAll('.stats-card');
+  if(!track||!cards.length) return;
+  var i=0,n=cards.length;
+  function mover(d){i=(i+d+n)%n;track.style.transform='translateX(-'+(i*100)+'%)';}
+  document.querySelectorAll('.stats-nav').forEach(function(b){
+    b.onclick=function(){mover(b.classList.contains('next')?1:-1);};
+  });
+  mover(0);
+}
+statsCarousel();
 viva();graf();setInterval(viva,15000);setInterval(graf,30000);
 fetchPronostico();setInterval(fetchPronostico,600000);
 })();

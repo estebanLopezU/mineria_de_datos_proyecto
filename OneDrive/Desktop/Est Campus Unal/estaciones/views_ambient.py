@@ -277,6 +277,33 @@ def _detalle(request, est, device_id):
                                     radmax=Max("radiacion_solar"))
             tmax, tmin, pico_rachas = agg["tmax"], agg["tmin"], agg["racha"]
             pico_rad = agg["radmax"]
+            # Estadísticas del día para el carrusel de sensores.
+            filas_dia = list(del_dia)
+            from collections import Counter
+
+            def _stat(attr):
+                vals = [getattr(f, attr) for f in filas_dia if getattr(f, attr) is not None]
+                if not vals:
+                    return {"max": None, "min": None, "avg": None}
+                return {"max": max(vals), "min": min(vals),
+                        "avg": round(sum(vals) / len(vals), 1)}
+
+            stats = {
+                "temperatura": _stat("temperatura"),
+                "humedad_relativa": _stat("humedad_relativa"),
+                "presion_barometrica": _stat("presion_barometrica"),
+                "velocidad_viento": _stat("velocidad_viento"),
+                "radiacion_solar": _stat("radiacion_solar"),
+                "precipitacion": {
+                    "total": round(sum((f.precipitacion or 0) for f in filas_dia), 1),
+                    "max_rate": round(max([(f.precipitacion or 0) for f in filas_dia] or [0]), 1),
+                    "avg": None,
+                },
+                "direccion_viento": {"dominante": None},
+            }
+            dirs = [f.direccion_viento for f in filas_dia if f.direccion_viento is not None]
+            if dirs:
+                stats["direccion_viento"]["dominante"] = Counter(dirs).most_common(1)[0][0]
         recientes = list(
             Lectura.objects.filter(estacion=est)
             .order_by("-timestamp")
@@ -318,6 +345,7 @@ def _detalle(request, est, device_id):
             consola["uv_riesgo"] = None
     ctx = {
         "estacion": est,
+        "stats": stats if ultima is not None else None,
         "codigo": AMBIENT_CODIGO,
         "device_id": device_id,
         "ultima": ultima,
