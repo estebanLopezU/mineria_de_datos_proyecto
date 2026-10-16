@@ -26,10 +26,14 @@ Lo que hace:
 ```powershell
 . .\scripts\10_activar_entorno.ps1
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 0.0.0.0:5000
 ```
 
-Abrir http://127.0.0.1:8000/ en el navegador. La base ya viene con todo el
+> Puerto unico `5000` en `0.0.0.0` (la consola Ambient solo reporta ahi).
+> No usar `8000` ni `127.0.0.1`: dejan zombies y la consola no llega.
+> Arranque rapido: `.\scripts\05_arrancar_servidor.ps1` (mata zombies y arranca).
+
+Abrir http://127.0.0.1:5000/ en el navegador. La base ya viene con todo el
 historico cargado; si se quiere recargar (o cargar solo un tramo):
 
 ```powershell

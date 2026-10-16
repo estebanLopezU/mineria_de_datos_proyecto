@@ -205,6 +205,16 @@ def traducir_ambient(params):
     return campos, advertencias
 
 
+def dispositivo_desde_params(params):
+    """ID de la consola (parametro ID/PASSKEY/MAC). 'DESCONOCIDA' si no hay."""
+    bajas = {str(k).lower(): v for k, v in params.items()}
+    for clave in ("id", "passkey", "mac", "stationtype"):
+        valor = (bajas.get(clave) or "").strip()
+        if valor and valor != "x":
+            return valor[:64]
+    return "DESCONOCIDA"
+
+
 def estacion_ambient():
     """Obtiene o crea la estacion logica 99 (sin tocar 24/29)."""
     est, _ = Estacion.objects.get_or_create(
