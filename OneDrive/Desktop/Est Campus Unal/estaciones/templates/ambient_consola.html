@@ -44,9 +44,10 @@ body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:#0b1526;col
 .vivo{font-size:.8rem;color:#34d399;margin-top:10px;text-align:center}
 /* Tarjetas estilo Ecowitt (oscuro). .fila1/.fila2 se vuelven invisibles
    para no romper viva()/graf(): solo cambia el layout. */
-.pantalla.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
-.pantalla.tarjetas .card.fc{grid-column:span 2}
-@media(max-width:700px){.pantalla.tarjetas .card.fc{grid-column:span 1}}
+.pantalla.tarjetas{display:flex;flex-wrap:wrap;gap:12px;background:none;border:none;padding:0;box-shadow:none}
+.pantalla.tarjetas .card.fc{flex:1 1 100%}
+.pantalla.tarjetas .card{flex:1 1 260px;min-height:200px}
+@media(max-width:700px){.pantalla.tarjetas .card.fc{flex:1 1 100%}}
 .card{background:linear-gradient(180deg,rgba(19,31,54,.96),rgba(11,21,38,.96));border:1px solid #22344f;border-radius:14px;padding:14px;min-width:0}
 .card-h{display:flex;align-items:center;gap:8px;color:#94a3b8;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
 .card-h .ico{width:26px;height:26px;border-radius:50%;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem}
@@ -83,7 +84,7 @@ body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:#0b1526;col
 .pantalla.tarjetas{background:none;border:none;padding:0;box-shadow:none}
 .pantalla.tarjetas .fila1,.pantalla.tarjetas .fila2{display:contents}
 .pantalla.tarjetas .ayuda{display:none}
-.pantalla.tarjetas .bajo{grid-column:1/-1;margin-top:14px}
+.pantalla.tarjetas .bajo{width:100%;margin-top:14px}
 body[data-escena="lluvia"] .card,body[data-escena="frio"] .card,body[data-escena="calor"] .card{border-color:#334155}
 .tabla{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:14px}
 .tabla th,.tabla td{padding:6px 8px;border-bottom:1px solid rgba(148,163,184,.2);text-align:right}
